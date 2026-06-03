@@ -11,7 +11,7 @@ const units = [
   { key: 'seconds', label: 'sec' },
 ] as const;
 ---
-<div class="countdown" id="countdown" data-due={dueIso} aria-live="polite">
+<div class:list={['countdown', { 'is-past': initial.isPast }]} id="countdown" data-due={dueIso} aria-live="polite">
   {units.map((u) => (
     <div class="unit">
       <span class="num" data-unit={u.key}>{String(initial[u.key]).padStart(2, '0')}</span>
@@ -25,6 +25,7 @@ const units = [
   const el = document.getElementById('countdown');
   if (el) {
     const due = new Date(el.dataset.due!);
+    let timer: ReturnType<typeof setInterval> | undefined;
     const tick = () => {
       const c = getCountdown(due, new Date());
       (['days','hours','minutes','seconds'] as const).forEach((k) => {
@@ -33,11 +34,13 @@ const units = [
       });
       if (c.isPast) {
         el.classList.add('is-past');
-        clearInterval(timer);
+        if (timer) clearInterval(timer);
       }
     };
     tick();
-    const timer = setInterval(tick, 1000);
+    if (!getCountdown(due, new Date()).isPast) {
+      timer = setInterval(tick, 1000);
+    }
   }
 </script>
 
