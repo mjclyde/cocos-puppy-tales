@@ -1,0 +1,51 @@
+---
+---
+<form class="waitlist" id="waitlist-form" action="/api/waitlist" method="POST">
+  <div class="field"><label for="wl-name">Your name *</label><input id="wl-name" name="name" required maxlength="100" /></div>
+  <div class="field"><label for="wl-email">Email *</label><input id="wl-email" name="email" type="email" required /></div>
+  <div class="field"><label for="wl-phone">Phone</label><input id="wl-phone" name="phone" type="tel" maxlength="40" /></div>
+  <div class="field"><label for="wl-location">City & state *</label><input id="wl-location" name="location" required maxlength="120" /></div>
+  <div class="field full"><label for="wl-about">Tell us about your home & family *</label><textarea id="wl-about" name="about" required maxlength="2000" rows="4"></textarea></div>
+  <div class="field full"><label for="wl-prefs">Any preferences? (color / sex)</label><input id="wl-prefs" name="preferences" maxlength="500" /></div>
+  <div class="field full"><label for="wl-source">How did you hear about Coco?</label><input id="wl-source" name="source" maxlength="200" /></div>
+  <div class="field full check">
+    <label><input type="checkbox" name="read_expectations" required /> I've read <a href="/breed">what owning a Bernese is like</a>. *</label>
+  </div>
+  <!-- Honeypot: hidden from humans -->
+  <div class="hp" aria-hidden="true"><label>Website<input name="website" tabindex="-1" autocomplete="off" /></label></div>
+  <button class="btn" type="submit">Join the waitlist</button>
+  <p class="msg" id="wl-msg" role="status" aria-live="polite"></p>
+</form>
+
+<script>
+  const form = document.getElementById('waitlist-form') as HTMLFormElement | null;
+  const msg = document.getElementById('wl-msg');
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!msg) return;
+    msg.textContent = 'Sending…';
+    try {
+      const res = await fetch('/api/waitlist', { method: 'POST', body: new FormData(form) });
+      const data = await res.json();
+      msg.textContent = data.ok ? data.message : data.error;
+      msg.style.color = data.ok ? 'var(--c-sage)' : 'var(--c-brown)';
+      if (data.ok) form.reset();
+    } catch {
+      msg.textContent = 'Something went wrong. Please try again.';
+      msg.style.color = 'var(--c-brown)';
+    }
+  });
+</script>
+
+<style>
+  .waitlist { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; max-width: 720px; }
+  .field { display: flex; flex-direction: column; gap: 0.3rem; }
+  .field.full { grid-column: 1 / -1; }
+  label { font-weight: 700; font-size: 0.9rem; }
+  input, textarea { padding: 0.6rem 0.8rem; border-radius: 10px; border: 2px solid rgba(43,41,38,0.2); font: inherit; }
+  input:focus, textarea:focus { outline: none; border-color: var(--c-navy); }
+  .check label { font-weight: 400; }
+  .hp { position: absolute; left: -9999px; }
+  .msg { grid-column: 1 / -1; margin: 0; font-weight: 700; }
+  @media (max-width: 600px) { .waitlist { grid-template-columns: 1fr; } }
+</style>
