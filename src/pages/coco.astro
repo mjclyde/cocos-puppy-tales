@@ -1,0 +1,39 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { Image } from 'astro:assets';
+import { getEntry, render } from 'astro:content';
+
+const coco = await getEntry('coco', 'coco');
+const { Content } = await render(coco!);
+const { name, breed, heroImage, personalityTraits, healthFacts, pedigree } = coco!.data;
+---
+<BaseLayout title={`Meet ${name} — Coco's Puppy Nursery`} description={`Meet ${name}, our ${breed}.`}>
+  <section class="section">
+    <div class="container coco-grid">
+      <Image src={heroImage} alt={`${name} the ${breed}`} class="coco-img" widths={[400, 800]} sizes="(max-width: 700px) 100vw, 420px" />
+      <div>
+        <span class="chip">{breed}</span>
+        <h1>Meet {name}</h1>
+        <div class="traits">
+          {personalityTraits.map((t) => <span class="trait">{t}</span>)}
+        </div>
+        <div class="prose"><Content /></div>
+        {healthFacts.length > 0 && (
+          <>
+            <h3>Health & pedigree</h3>
+            <ul>{healthFacts.map((f) => <li>{f}</li>)}</ul>
+            {pedigree && <p>{pedigree}</p>}
+          </>
+        )}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .coco-grid { display: grid; grid-template-columns: 420px 1fr; gap: 2rem; align-items: start; }
+  .coco-img { border-radius: var(--radius); box-shadow: var(--shadow-lg); width: 100%; height: auto; }
+  .traits { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 0.75rem 0; }
+  .trait { background: var(--c-sage); color: #fff; border-radius: var(--radius-pill); padding: 0.3rem 0.8rem; font-weight: 700; font-size: 0.85rem; }
+  @media (max-width: 700px) { .coco-grid { grid-template-columns: 1fr; } }
+</style>
