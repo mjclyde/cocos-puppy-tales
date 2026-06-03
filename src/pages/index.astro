@@ -1,17 +1,48 @@
 ---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import CountdownTimer from '../components/CountdownTimer.astro';
+// TODO(Task 11): restore SubscribeForm — import SubscribeForm from '../components/SubscribeForm.astro';
+import { getEntry } from 'astro:content';
 
+const coco = await getEntry('coco', 'coco');
+const site = await getEntry('site', 'config');
+const { dueDate, litterEstimate, flags } = site!.data;
 ---
+<BaseLayout title="Coco's Puppy Nursery">
+  <Hero image={coco!.data.heroImage} name={coco!.data.name} />
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+  <section class="section countdown-section">
+    <div class="container">
+      <h2>Expected arrival</h2>
+      <p>We're expecting {litterEstimate}! Here's the countdown:</p>
+      <CountdownTimer dueDate={dueDate} />
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container teasers">
+      <a class="card teaser" href="/journey"><h3>📅 The Journey</h3><p>Weekly bump updates and Coco's pregnancy diary.</p></a>
+      <a class="card teaser" href="/coco"><h3>🐶 Meet Coco</h3><p>The best dog in the world. We may be biased.</p></a>
+      <a class="card teaser" href="/waitlist"><h3>🧸 Waitlist</h3><p>Hoping to welcome a puppy? Start here.</p></a>
+    </div>
+  </section>
+
+  {flags.showSubscribe && (
+    <section class="section subscribe-section">
+      <div class="container">
+        <h2>Follow along</h2>
+        <p>Want updates without joining the waitlist? Get an email when there's big news.</p>
+        {/* TODO(Task 11): restore SubscribeForm — replace this comment with <SubscribeForm /> */}
+      </div>
+    </section>
+  )}
+</BaseLayout>
+
+<style>
+  .teasers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+  .teaser { text-decoration: none; color: inherit; transition: transform 0.12s, box-shadow 0.12s; }
+  .teaser:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+  .subscribe-section { background: #fff; }
+  @media (max-width: 700px) { .teasers { grid-template-columns: 1fr; } }
+</style>
