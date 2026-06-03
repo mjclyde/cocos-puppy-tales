@@ -40,7 +40,7 @@ const site = defineCollection({
     flags: z.object({
       showGallery: z.boolean().default(true),
       showSubscribe: z.boolean().default(true),
-    }).default({}),
+    }).default({ showGallery: true, showSubscribe: true }),
   }),
 });
 
