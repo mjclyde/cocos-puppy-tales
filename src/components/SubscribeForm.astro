@@ -14,10 +14,14 @@
     e.preventDefault();
     if (!msg) return;
     msg.textContent = 'Subscribing…';
-    const res = await fetch('/api/subscribe', { method: 'POST', body: new FormData(form) });
-    const data = await res.json();
-    msg.textContent = data.ok ? data.message : data.error;
-    if (data.ok) form.reset();
+    try {
+      const res = await fetch('/api/subscribe', { method: 'POST', body: new FormData(form) });
+      const data = await res.json();
+      msg.textContent = data.ok ? data.message : data.error;
+      if (data.ok) form.reset();
+    } catch {
+      msg.textContent = 'Something went wrong. Please try again.';
+    }
   });
 </script>
 
