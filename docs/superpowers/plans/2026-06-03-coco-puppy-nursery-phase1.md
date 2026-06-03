@@ -352,14 +352,19 @@ couch. Not long now!
 
 - [ ] **Step 6: Write `src/content/site/config.json`**
 
+> Astro's `file()` loader requires an **array of entries each with an `id`** (or an object keyed by id), NOT a bare flat object. The single site-config entry therefore uses `id: "config"`, and downstream code retrieves it with `getEntry('site', 'config')`.
+
 ```json
-{
-  "dueDate": "2026-06-22T00:00:00.000Z",
-  "litterEstimate": "at least 5 puppies",
-  "contactEmail": "hello@cocospuppynursery.com",
-  "socialLinks": [],
-  "flags": { "showGallery": true, "showSubscribe": true }
-}
+[
+  {
+    "id": "config",
+    "dueDate": "2026-06-22T00:00:00.000Z",
+    "litterEstimate": "at least 5 puppies",
+    "contactEmail": "hello@cocospuppynursery.com",
+    "socialLinks": [],
+    "flags": { "showGallery": true, "showSubscribe": true }
+  }
+]
 ```
 
 - [ ] **Step 7: Verify content builds**
