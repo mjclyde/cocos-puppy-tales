@@ -1,0 +1,27 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import UpdateCard from '../components/UpdateCard.astro';
+import { getCollection, render } from 'astro:content';
+
+const updates = (await getCollection('journey', ({ data }) => data.published))
+  .sort((a, b) => b.data.week - a.data.week);
+
+const rendered = await Promise.all(updates.map(async (u) => ({
+  data: u.data,
+  Content: (await render(u)).Content,
+})));
+---
+<BaseLayout title="The Journey — Coco's Puppy Nursery" description="Weekly pregnancy updates following Coco's journey.">
+  <section class="section">
+    <div class="container">
+      <h1>The Journey</h1>
+      <p>Weekly updates from Coco's pregnancy — newest first.</p>
+      {rendered.length === 0 && <p>Updates are coming soon. 🐾</p>}
+      {rendered.map(({ data, Content }) => (
+        <UpdateCard week={data.week} title={data.title} date={data.date} bellySizeComparison={data.bellySizeComparison} bellyPhoto={data.bellyPhoto}>
+          <Content />
+        </UpdateCard>
+      ))}
+    </div>
+  </section>
+</BaseLayout>
