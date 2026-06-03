@@ -6,7 +6,7 @@
 
 **Architecture:** Static-first Astro site on Vercel. Pages prerender to HTML; the countdown is a client island; user-submitted data flows through two on-demand API endpoints (`prerender = false`) — waitlist → Supabase, subscribe → Buttondown. Content (Coco bio, journey, breed, site config) lives in typed Astro content collections that the developer edits and pushes.
 
-**Tech Stack:** Astro 5, `@astrojs/vercel`, `@astrojs/sitemap`, `@fontsource/nunito`, `@supabase/supabase-js`, `zod`, Vitest (unit), Playwright (smoke).
+**Tech Stack:** Astro 6 (`npm create astro` resolved 6.4.x as current stable), `@astrojs/vercel`, `@astrojs/sitemap`, `@fontsource/nunito`, `@supabase/supabase-js`, `zod` (v4), Vitest (unit), Playwright (smoke). Verified the content-collection and on-demand-endpoint APIs carry from Astro 5 → 6.
 
 **Spec:** `docs/superpowers/specs/2026-06-03-coco-puppy-nursery-design.md`
 
