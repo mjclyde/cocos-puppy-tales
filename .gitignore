@@ -1,0 +1,20 @@
+# Brainstorming visual-companion working files
+.superpowers/
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+.astro/
+.output/
+.vercel/
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+
+# OS / editor
+.DS_Store
+*.log
