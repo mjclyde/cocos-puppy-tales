@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://cocospuppynursery.com/sitemap-index.xml
