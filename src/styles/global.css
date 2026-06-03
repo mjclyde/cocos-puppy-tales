@@ -1,0 +1,36 @@
+@import '@fontsource/nunito/400.css';
+@import '@fontsource/nunito/700.css';
+@import '@fontsource/nunito/900.css';
+@import './tokens.css';
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  font-weight: 400;
+}
+h1, h2, h3 { color: var(--heading); font-weight: 900; line-height: 1.1; margin: 0 0 0.5em; }
+a { color: var(--c-navy); }
+img { max-width: 100%; display: block; }
+.container { max-width: var(--maxw); margin: 0 auto; padding: 0 1.25rem; }
+.section { padding: 3rem 0; }
+.btn {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: var(--pop); color: var(--c-charcoal);
+  font-weight: 900; text-decoration: none;
+  padding: 0.7rem 1.4rem; border-radius: var(--radius-pill);
+  border: none; cursor: pointer; transition: transform 0.12s, filter 0.12s;
+}
+.btn:hover { transform: translateY(-2px); filter: brightness(1.03); }
+.btn-secondary { background: var(--c-navy); color: var(--c-cream); }
+.chip {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: var(--c-sage); color: #fff; font-weight: 700; font-size: 0.85rem;
+  padding: 0.4rem 0.9rem; border-radius: var(--radius-pill);
+}
+.card { background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); padding: 1.25rem; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }

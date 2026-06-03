@@ -1,0 +1,25 @@
+:root {
+  /* Bernese palette (spec §7) */
+  --c-charcoal: #2b2926;
+  --c-brown:    #a86b43;
+  --c-cream:    #f7efe1;
+  --c-sage:     #6f8f5e;
+  --c-navy:     #2f4156;
+  --c-honey:    #e9b949;
+
+  /* Roles — lean on cream/charcoal/navy; brown/sage/honey are accents */
+  --bg:         var(--c-cream);
+  --text:       var(--c-charcoal);
+  --heading:    var(--c-navy);
+  --accent:     var(--c-sage);
+  --accent-2:   var(--c-brown);
+  --pop:        var(--c-honey);
+
+  --font-body: 'Nunito', system-ui, -apple-system, sans-serif;
+  --radius: 16px;
+  --radius-pill: 999px;
+  --shadow: 0 4px 18px rgba(43, 41, 38, 0.10);
+  --shadow-lg: 0 10px 28px rgba(43, 41, 38, 0.16);
+  --maxw: 1100px;
+  --space: 1rem;
+}
