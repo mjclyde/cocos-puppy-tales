@@ -2,7 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/Hero.astro';
 import CountdownTimer from '../components/CountdownTimer.astro';
-// TODO(Task 11): restore SubscribeForm — import SubscribeForm from '../components/SubscribeForm.astro';
+import SubscribeForm from '../components/SubscribeForm.astro';
 import { getEntry } from 'astro:content';
 
 const coco = await getEntry('coco', 'coco');
@@ -33,7 +33,7 @@ const { dueDate, litterEstimate, flags } = site!.data;
       <div class="container">
         <h2>Follow along</h2>
         <p>Want updates without joining the waitlist? Get an email when there's big news.</p>
-        {/* TODO(Task 11): restore SubscribeForm — replace this comment with <SubscribeForm /> */}
+        <SubscribeForm />
       </div>
     </section>
   )}
