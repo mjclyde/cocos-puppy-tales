@@ -23,3 +23,9 @@ playwright-report/
 # OS / editor
 .DS_Store
 *.log
+
+# Claude Code local (per-user) settings
+.claude/settings.local.json
+
+# Installed skill content (restored from skills-lock.json)
+.claude/skills/
