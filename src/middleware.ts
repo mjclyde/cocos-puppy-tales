@@ -9,7 +9,7 @@ function isAdminPath(pathname: string): boolean {
   return (
     pathname === '/admin' ||
     pathname.startsWith('/admin/') ||
-    pathname.startsWith('/api/admin')
+    pathname.startsWith('/api/admin/')
   );
 }
 
