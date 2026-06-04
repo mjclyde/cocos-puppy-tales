@@ -19,6 +19,9 @@ export function verifySessionToken(
   now: number,
 ): boolean {
   if (!token) return false;
+  // Fail closed: an empty secret must never validate a token, otherwise a token
+  // forged with an empty-key HMAC would be accepted in a misconfigured deployment.
+  if (!secret) return false;
   const idx = token.indexOf(SEP);
   if (idx <= 0) return false;
   const expiry = token.slice(0, idx);

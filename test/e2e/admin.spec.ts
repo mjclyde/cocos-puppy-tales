@@ -27,6 +27,9 @@ test('correct password logs in; logout returns to login', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Log out' })).toBeVisible();
   await page.getByRole('button', { name: 'Log out' }).click();
   await expect(page).toHaveURL(/\/admin\/login/);
+  // The session must actually be cleared: /admin should redirect back to login.
+  await page.goto('/admin');
+  await expect(page).toHaveURL(/\/admin\/login/);
 });
 
 // The data-flow test needs real Supabase credentials in the dev server's env, so it

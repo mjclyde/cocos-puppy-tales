@@ -32,4 +32,9 @@ describe('session token', () => {
     expect(verifySessionToken(undefined, SECRET, NOW)).toBe(false);
     expect(verifySessionToken('garbage', SECRET, NOW)).toBe(false);
   });
+
+  it('fails closed when the secret is empty, even for an empty-secret token', () => {
+    const token = createSessionToken('', NOW, TTL);
+    expect(verifySessionToken(token, '', NOW)).toBe(false);
+  });
 });
