@@ -1,0 +1,60 @@
+---
+import type { WaitlistEntry } from '../../lib/admin/waitlist-admin';
+import WaitlistRow from './WaitlistRow.astro';
+interface Props { entries: WaitlistEntry[]; }
+const { entries } = Astro.props;
+---
+{entries.length === 0 ? (
+  <p class="empty">No waitlist entries yet. 🐾</p>
+) : (
+  <table class="wl">
+    <thead><tr><th>Family</th><th>About</th><th>Manage</th></tr></thead>
+    <tbody>
+      {entries.map((entry) => <WaitlistRow entry={entry} />)}
+    </tbody>
+  </table>
+)}
+
+<script>
+  // Progressive enhancement: save each row inline without a full-page reload.
+  document.querySelectorAll<HTMLFormElement>('form.entry-form').forEach((form) => {
+    const saved = form.querySelector<HTMLElement>('.saved');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (saved) { saved.textContent = 'Saving…'; saved.style.color = 'var(--c-navy)'; }
+      try {
+        const res = await fetch('/api/admin/entry', {
+          method: 'POST',
+          headers: { Accept: 'application/json' },
+          body: new FormData(form),
+        });
+        const data = await res.json();
+        if (saved) {
+          saved.textContent = data.ok ? 'Saved ✓' : (data.error ?? 'Error');
+          saved.style.color = data.ok ? 'var(--c-sage)' : 'var(--c-brown)';
+        }
+      } catch {
+        if (saved) { saved.textContent = 'Error'; saved.style.color = 'var(--c-brown)'; }
+      }
+    });
+  });
+</script>
+
+<style>
+  .wl { width: 100%; border-collapse: collapse; }
+  .wl th, .wl td { text-align: left; vertical-align: top; padding: 0.75rem; border-bottom: 1px solid rgba(43,41,38,0.12); }
+  .meta { font-size: 0.8rem; opacity: 0.7; margin-top: 0.25rem; }
+  .about p { margin: 0 0 0.4rem; }
+  .prefs, .read { font-size: 0.85rem; }
+  .entry-form { display: grid; gap: 0.4rem; min-width: 220px; }
+  .entry-form label { font-weight: 700; font-size: 0.85rem; display: grid; gap: 0.2rem; }
+  .entry-form select, .entry-form textarea { font: inherit; padding: 0.4rem; border-radius: 8px; border: 2px solid rgba(43,41,38,0.2); }
+  .entry-form button { background: var(--c-honey); color: var(--c-charcoal); border: 0; border-radius: 999px; padding: 0.4rem 1rem; font-weight: 800; cursor: pointer; }
+  .saved { font-weight: 700; font-size: 0.85rem; min-height: 1.1em; }
+  .empty { font-weight: 700; }
+  @media (max-width: 800px) {
+    .wl, .wl thead, .wl tbody, .wl tr, .wl th, .wl td { display: block; }
+    .wl thead { display: none; }
+    .wl tr { border: 2px solid rgba(43,41,38,0.12); border-radius: 12px; margin-bottom: 1rem; padding: 0.5rem; }
+  }
+</style>
