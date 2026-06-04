@@ -1,0 +1,35 @@
+---
+import type { WaitlistEntry } from '../../lib/admin/waitlist-admin';
+import { WAITLIST_STATUSES } from '../../lib/admin/entry-input';
+interface Props { entry: WaitlistEntry; }
+const { entry } = Astro.props;
+const created = new Date(entry.created_at).toLocaleDateString();
+---
+<tr>
+  <td class="who">
+    <strong>{entry.name}</strong><br />
+    <a href={`mailto:${entry.email}`}>{entry.email}</a>
+    {entry.phone && <><br />{entry.phone}</>}
+    <div class="meta">{entry.location} · {created}{entry.source && <> · via {entry.source}</>}</div>
+  </td>
+  <td class="about">
+    <p>{entry.about}</p>
+    {entry.preferences && <p class="prefs"><em>Prefs:</em> {entry.preferences}</p>}
+    <p class="read">{entry.read_expectations ? '✅ Read expectations' : '⚠️ Did not confirm expectations'}</p>
+  </td>
+  <td class="manage">
+    <form class="entry-form" method="POST" action="/api/admin/entry">
+      <input type="hidden" name="id" value={entry.id} />
+      <label>Status
+        <select name="status">
+          {WAITLIST_STATUSES.map((s) => <option value={s} selected={s === entry.status}>{s}</option>)}
+        </select>
+      </label>
+      <label>Notes
+        <textarea name="notes" rows="3">{entry.notes ?? ''}</textarea>
+      </label>
+      <button type="submit">Save</button>
+      <span class="saved" role="status" aria-live="polite"></span>
+    </form>
+  </td>
+</tr>
