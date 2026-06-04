@@ -27,6 +27,10 @@ describe('parseEntryUpdate', () => {
     expect(parseEntryUpdate({ id }).success).toBe(false);
   });
 
+  it('rejects notes longer than 4000 characters', () => {
+    expect(parseEntryUpdate({ id, notes: 'x'.repeat(4001) }).success).toBe(false);
+  });
+
   it('exposes the four lifecycle statuses', () => {
     expect(WAITLIST_STATUSES).toEqual(['new', 'contacted', 'approved', 'declined']);
   });

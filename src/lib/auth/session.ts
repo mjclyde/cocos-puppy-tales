@@ -24,8 +24,13 @@ export function verifySessionToken(
   const expiry = token.slice(0, idx);
   const sig = token.slice(idx + 1);
   const expected = sign(expiry, secret);
-  if (sig.length !== expected.length) return false; // timingSafeEqual needs equal lengths
-  if (!timingSafeEqual(Buffer.from(sig), Buffer.from(expected))) return false;
+  // Decode as hex so timingSafeEqual always gets equal-length byte buffers.
+  // A malformed (non-hex / multi-byte) sig decodes to a buffer that won't match,
+  // rather than throwing a RangeError on a length mismatch.
+  const sigBuf = Buffer.from(sig, 'hex');
+  const expectedBuf = Buffer.from(expected, 'hex');
+  if (sigBuf.length !== expectedBuf.length) return false;
+  if (!timingSafeEqual(sigBuf, expectedBuf)) return false;
   const expiryNum = Number(expiry);
   if (!Number.isFinite(expiryNum)) return false;
   return expiryNum > now;
