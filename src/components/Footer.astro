@@ -1,0 +1,22 @@
+---
+import { getEntry } from 'astro:content';
+import PawIcon from './PawIcon.astro';
+const site = await getEntry('site', 'config');
+const { contactEmail, socialLinks } = site!.data;
+---
+<footer class="footer">
+  <div class="container">
+    <p class="brand-line"><PawIcon /> Coco's Puppy Tales — following the journey from bump to homecoming.</p>
+    <p>
+      <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
+      {socialLinks.map((s) => (<> · <a href={s.url}>{s.label}</a></>))}
+    </p>
+    <p class="fine">© {new Date().getFullYear()} Coco's Puppy Tales.</p>
+  </div>
+</footer>
+<style>
+  .footer { background: var(--c-navy); color: var(--c-cream); margin-top: 3rem; padding: 2rem 0; }
+  .brand-line { display: flex; align-items: center; gap: 0.45rem; }
+  .footer a { color: var(--c-honey); }
+  .fine { opacity: 0.7; font-size: 0.85rem; }
+</style>

@@ -1,0 +1,32 @@
+---
+---
+<form class="subscribe" id="subscribe-form" action="/api/subscribe" method="POST">
+  <label class="visually-hidden" for="sub-email">Email address</label>
+  <input id="sub-email" name="email" type="email" required placeholder="you@example.com" />
+  <button class="btn" type="submit">Get updates</button>
+  <p class="msg" id="sub-msg" role="status" aria-live="polite"></p>
+</form>
+
+<script>
+  const form = document.getElementById('subscribe-form') as HTMLFormElement | null;
+  const msg = document.getElementById('sub-msg');
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!msg) return;
+    msg.textContent = 'Subscribing…';
+    try {
+      const res = await fetch('/api/subscribe', { method: 'POST', body: new FormData(form) });
+      const data = await res.json();
+      msg.textContent = data.ok ? data.message : data.error;
+      if (data.ok) form.reset();
+    } catch {
+      msg.textContent = 'Something went wrong. Please try again.';
+    }
+  });
+</script>
+
+<style>
+  .subscribe { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+  .subscribe input { padding: 0.7rem 1rem; border-radius: var(--radius-pill); border: 2px solid var(--c-navy); min-width: 240px; font: inherit; }
+  .msg { width: 100%; margin: 0.5rem 0 0; font-weight: 700; color: var(--c-sage); }
+</style>

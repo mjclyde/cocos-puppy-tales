@@ -10,6 +10,11 @@ dist/
 .output/
 .vercel/
 
+# Playwright
+test-results/
+playwright-report/
+.playwright/
+
 # Env / secrets
 .env
 .env.*

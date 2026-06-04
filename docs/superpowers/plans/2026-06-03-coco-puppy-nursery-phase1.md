@@ -6,7 +6,7 @@
 
 **Architecture:** Static-first Astro site on Vercel. Pages prerender to HTML; the countdown is a client island; user-submitted data flows through two on-demand API endpoints (`prerender = false`) — waitlist → Supabase, subscribe → Buttondown. Content (Coco bio, journey, breed, site config) lives in typed Astro content collections that the developer edits and pushes.
 
-**Tech Stack:** Astro 5, `@astrojs/vercel`, `@astrojs/sitemap`, `@fontsource/nunito`, `@supabase/supabase-js`, `zod`, Vitest (unit), Playwright (smoke).
+**Tech Stack:** Astro 6 (`npm create astro` resolved 6.4.x as current stable), `@astrojs/vercel`, `@astrojs/sitemap`, `@fontsource/nunito`, `@supabase/supabase-js`, `zod` (v4), Vitest (unit), Playwright (smoke). Verified the content-collection and on-demand-endpoint APIs carry from Astro 5 → 6.
 
 **Spec:** `docs/superpowers/specs/2026-06-03-coco-puppy-nursery-design.md`
 
@@ -352,14 +352,19 @@ couch. Not long now!
 
 - [ ] **Step 6: Write `src/content/site/config.json`**
 
+> Astro's `file()` loader requires an **array of entries each with an `id`** (or an object keyed by id), NOT a bare flat object. The single site-config entry therefore uses `id: "config"`, and downstream code retrieves it with `getEntry('site', 'config')`.
+
 ```json
-{
-  "dueDate": "2026-06-22T00:00:00.000Z",
-  "litterEstimate": "at least 5 puppies",
-  "contactEmail": "hello@cocospuppynursery.com",
-  "socialLinks": [],
-  "flags": { "showGallery": true, "showSubscribe": true }
-}
+[
+  {
+    "id": "config",
+    "dueDate": "2026-06-22T00:00:00.000Z",
+    "litterEstimate": "at least 5 puppies",
+    "contactEmail": "hello@cocospuppynursery.com",
+    "socialLinks": [],
+    "flags": { "showGallery": true, "showSubscribe": true }
+  }
+]
 ```
 
 - [ ] **Step 7: Verify content builds**
@@ -1460,10 +1465,15 @@ npx playwright install chromium
 ```ts
 import { defineConfig } from '@playwright/test';
 
+// NOTE: the @astrojs/vercel adapter does not support `astro preview` for
+// on-demand routes, so we run the smoke tests against `astro dev`, which
+// serves both static pages and the API endpoints. The smoke tests do not
+// require real Supabase/Buttondown credentials (they only exercise the
+// validation path, which returns before any external call).
 export default defineConfig({
   testDir: './test/e2e',
   webServer: {
-    command: 'npm run build && npm run preview',
+    command: 'npm run dev',
     url: 'http://localhost:4321',
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

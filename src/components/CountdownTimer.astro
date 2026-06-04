@@ -1,0 +1,56 @@
+---
+import { getCountdown } from '../lib/countdown';
+interface Props { dueDate: Date; }
+const { dueDate } = Astro.props;
+const dueIso = dueDate.toISOString();
+const initial = getCountdown(dueDate, new Date()); // build-time paint; client corrects on load
+const units = [
+  { key: 'days', label: 'days' },
+  { key: 'hours', label: 'hrs' },
+  { key: 'minutes', label: 'min' },
+  { key: 'seconds', label: 'sec' },
+] as const;
+---
+<div class:list={['countdown', { 'is-past': initial.isPast }]} id="countdown" data-due={dueIso} aria-live="polite">
+  {units.map((u) => (
+    <div class="unit">
+      <span class="num" data-unit={u.key}>{String(initial[u.key]).padStart(2, '0')}</span>
+      <span class="lbl">{u.label}</span>
+    </div>
+  ))}
+</div>
+
+<script>
+  import { getCountdown } from '../lib/countdown';
+  const el = document.getElementById('countdown');
+  if (el) {
+    const due = new Date(el.dataset.due!);
+    let timer: ReturnType<typeof setInterval> | undefined;
+    const tick = () => {
+      const c = getCountdown(due, new Date());
+      (['days','hours','minutes','seconds'] as const).forEach((k) => {
+        const span = el.querySelector(`[data-unit="${k}"]`);
+        if (span) span.textContent = String(c[k]).padStart(2, '0');
+      });
+      if (c.isPast) {
+        el.classList.add('is-past');
+        if (timer) clearInterval(timer);
+      }
+    };
+    tick();
+    if (!getCountdown(due, new Date()).isPast) {
+      timer = setInterval(tick, 1000);
+    }
+  }
+</script>
+
+<style>
+  .countdown { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+  .unit {
+    background: var(--c-navy); color: var(--c-cream);
+    border-radius: var(--radius); padding: 0.75rem 1rem; min-width: 64px; text-align: center;
+  }
+  .num { display: block; font-size: 1.9rem; font-weight: 900; line-height: 1; }
+  .lbl { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.85; }
+  .is-past { opacity: 0.7; }
+</style>

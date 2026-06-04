@@ -1,0 +1,30 @@
+---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import PawIcon from './PawIcon.astro';
+interface Props { image: ImageMetadata; name: string; }
+const { image, name } = Astro.props;
+---
+<section class="hero">
+  <div class="container hero-grid">
+    <div class="hero-copy">
+      <span class="chip"><PawIcon /> Coco's litter</span>
+      <h1>Coco's Puppy Tales</h1>
+      <p class="lede">Follow {name}'s journey from pregnancy to puppy homecoming. 💕</p>
+      <div class="hero-cta">
+        <a class="btn" href="/journey">Follow the journey →</a>
+        <a class="btn btn-secondary" href="/waitlist">Join the waitlist</a>
+      </div>
+    </div>
+    <Image src={image} alt={`${name}, our Bernese Mountain Dog`} class="hero-img" widths={[400, 800]} sizes="(max-width: 700px) 100vw, 480px" />
+  </div>
+</section>
+<style>
+  .hero { background: var(--c-cream); padding: 2.5rem 0; }
+  .hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: center; }
+  .hero-copy h1 { font-size: clamp(2rem, 5vw, 3.2rem); margin-top: 0.6rem; }
+  .lede { font-size: 1.15rem; }
+  .hero-cta { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1.25rem; }
+  .hero-img { border-radius: var(--radius); box-shadow: var(--shadow-lg); width: 100%; height: auto; object-fit: cover; }
+  @media (max-width: 700px) { .hero-grid { grid-template-columns: 1fr; } }
+</style>
