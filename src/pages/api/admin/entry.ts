@@ -16,13 +16,16 @@ export const POST: APIRoute = async ({ request, redirect }) => {
   }
 
   const { id, status, notes } = parsed.data;
+  // Only include keys that were provided. An empty-string `notes` is intentional
+  // (it clears the field); the schema's refine guarantees at least one key is set.
   const patch: { status?: typeof status; notes?: string } = {};
   if (status !== undefined) patch.status = status;
   if (notes !== undefined) patch.notes = notes;
 
   try {
     await updateWaitlistEntry(getSupabase(), id, patch);
-  } catch {
+  } catch (err) {
+    console.error('[admin/entry] updateWaitlistEntry failed', err);
     return wantsJson ? json({ ok: false, error: 'Could not save changes.' }, 502) : redirect('/admin');
   }
 

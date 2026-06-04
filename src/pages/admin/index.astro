@@ -9,14 +9,15 @@ let entries: WaitlistEntry[] = [];
 let loadError = false;
 try {
   entries = await fetchWaitlistEntries(getSupabase());
-} catch {
+} catch (err) {
+  console.error('[admin] failed to load waitlist entries', err);
   loadError = true;
 }
 ---
 <AdminLayout title="Waitlist · Admin">
   <main class="dash">
     <header class="bar">
-      <h1>Waitlist <span class="count">{entries.length}</span></h1>
+      <h1>Waitlist {!loadError && <span class="count">{entries.length}</span>}</h1>
       <form method="POST" action="/api/admin/logout"><button type="submit">Log out</button></form>
     </header>
     {loadError
