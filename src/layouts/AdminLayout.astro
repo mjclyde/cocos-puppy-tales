@@ -1,0 +1,21 @@
+---
+import '../styles/global.css';
+interface Props { title: string; }
+const { title } = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <title>{title}</title>
+  </head>
+  <body class="admin-body">
+    <slot />
+    <style is:global>
+      body.admin-body { background: var(--c-cream); color: var(--c-charcoal); margin: 0; }
+    </style>
+  </body>
+</html>
