@@ -5,7 +5,7 @@ interface Props {
   size?: string | number;
   class?: string;
 }
-const { size = '1.1em', class: className } = Astro.props;
+const { size = '1.4em', class: className } = Astro.props;
 const dim = typeof size === 'number' ? `${size}px` : size;
 ---
 <svg
