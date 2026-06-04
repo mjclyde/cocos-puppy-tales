@@ -29,3 +29,6 @@ playwright-report/
 
 # Installed skill content (restored from skills-lock.json)
 .claude/skills/
+
+# Local agent working files
+.agents/
