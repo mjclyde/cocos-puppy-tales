@@ -1,0 +1,35 @@
+---
+// A small two-paw-print icon. Uses `currentColor`, so it renders light on dark/
+// colored backgrounds (e.g. the sage chip or navy footer) and dark on light ones.
+interface Props {
+  size?: string | number;
+  class?: string;
+}
+const { size = '1.1em', class: className } = Astro.props;
+const dim = typeof size === 'number' ? `${size}px` : size;
+---
+<svg
+  class={className}
+  width={dim}
+  height={dim}
+  viewBox="0 0 28 28"
+  fill="currentColor"
+  aria-hidden="true"
+  focusable="false"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <g transform="translate(1.5,2) scale(0.5)">
+    <circle cx="5" cy="10.5" r="2.2" />
+    <circle cx="9.8" cy="6.8" r="2.5" />
+    <circle cx="15" cy="6.8" r="2.5" />
+    <circle cx="19.8" cy="10.5" r="2.2" />
+    <ellipse cx="12.4" cy="16.5" rx="5" ry="4.2" />
+  </g>
+  <g transform="translate(11,9) scale(0.72)">
+    <circle cx="5" cy="10.5" r="2.2" />
+    <circle cx="9.8" cy="6.8" r="2.5" />
+    <circle cx="15" cy="6.8" r="2.5" />
+    <circle cx="19.8" cy="10.5" r="2.2" />
+    <ellipse cx="12.4" cy="16.5" rx="5" ry="4.2" />
+  </g>
+</svg>
