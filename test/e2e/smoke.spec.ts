@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test('home page shows hero, countdown, and nav works', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: "Coco's Puppy Nursery" })).toBeVisible();
+  await expect(page.getByRole('heading', { name: "Coco's Puppy Tales" })).toBeVisible();
   await expect(page.locator('#countdown .num').first()).toBeVisible();
   await page.getByRole('link', { name: 'The Journey' }).first().click();
   await expect(page).toHaveURL(/\/journey/);

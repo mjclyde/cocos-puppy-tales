@@ -4,7 +4,7 @@ import { getEntry, render } from 'astro:content';
 const breed = await getEntry('breed', 'about');
 const { Content } = await render(breed!);
 ---
-<BaseLayout title="The Breed — Coco's Puppy Nursery" description="About Bernese Mountain Dogs and what to expect as an owner.">
+<BaseLayout title="The Breed — Coco's Puppy Tales" description="About Bernese Mountain Dogs and what to expect as an owner.">
   <section class="section">
     <div class="container prose-page">
       <Content />

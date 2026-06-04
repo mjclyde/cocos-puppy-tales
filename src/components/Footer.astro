@@ -5,12 +5,12 @@ const { contactEmail, socialLinks } = site!.data;
 ---
 <footer class="footer">
   <div class="container">
-    <p>🐾 Coco's Puppy Nursery — following the journey from bump to homecoming.</p>
+    <p>🐾 Coco's Puppy Tales — following the journey from bump to homecoming.</p>
     <p>
       <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
       {socialLinks.map((s) => (<> · <a href={s.url}>{s.label}</a></>))}
     </p>
-    <p class="fine">© {new Date().getFullYear()} Coco's Puppy Nursery.</p>
+    <p class="fine">© {new Date().getFullYear()} Coco's Puppy Tales.</p>
   </div>
 </footer>
 <style>
