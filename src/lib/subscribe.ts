@@ -14,3 +14,7 @@ export interface SubscribePayload {
 export function buildSubscribePayload(email: string): SubscribePayload {
   return { email_address: email, tags: ['coco-nursery'] };
 }
+
+export function normalizeEmail(value: string): string {
+  return value.trim().toLowerCase();
+}

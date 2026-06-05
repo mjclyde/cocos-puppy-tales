@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { isValidEmail, buildSubscribePayload } from '../src/lib/subscribe';
+import { isValidEmail, buildSubscribePayload, normalizeEmail } from '../src/lib/subscribe';
 
 describe('subscribe helpers', () => {
   it('accepts a valid email', () => {
@@ -13,5 +13,11 @@ describe('subscribe helpers', () => {
       email_address: 'fan@example.com',
       tags: ['coco-nursery'],
     });
+  });
+  it('normalizes email by trimming and lowercasing', () => {
+    expect(normalizeEmail('  Fan@Example.COM  ')).toBe('fan@example.com');
+  });
+  it('leaves an already-normalized email unchanged', () => {
+    expect(normalizeEmail('fan@example.com')).toBe('fan@example.com');
   });
 });
