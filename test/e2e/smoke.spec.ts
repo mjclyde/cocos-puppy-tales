@@ -18,3 +18,10 @@ test('waitlist form shows a validation error on empty submit', async ({ page }) 
   await page.getByRole('button', { name: 'Join the waitlist' }).click();
   await expect(page.locator('#wl-msg')).not.toHaveText('', { timeout: 5000 });
 });
+
+test('unsubscribe page shows an invalid-link message for a bogus token', async ({ page }) => {
+  // A malformed token never verifies, so the page renders the invalid state
+  // without touching the database.
+  await page.goto('/unsubscribe?t=bogus');
+  await expect(page.getByRole('heading', { name: 'This unsubscribe link is invalid' })).toBeVisible();
+});

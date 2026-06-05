@@ -7,5 +7,7 @@ export default defineConfig({
   site: 'https://cocospuppynursery.com', // update to the real domain when known
   output: 'static',                       // pages prerender; endpoints opt out per-file
   adapter: vercel(),
-  integrations: [sitemap({ filter: (page) => !page.includes('/admin') })],
+  integrations: [
+    sitemap({ filter: (page) => !page.includes('/admin') && !page.includes('/unsubscribe') }),
+  ],
 });
