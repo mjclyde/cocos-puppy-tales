@@ -1,31 +1,33 @@
 export const prerender = false;
 import type { APIRoute } from 'astro';
-import { isValidEmail, buildSubscribePayload } from '../../lib/subscribe';
+import { isValidEmail, normalizeEmail } from '../../lib/subscribe';
+import { getSupabase } from '../../lib/supabase';
 
 export const POST: APIRoute = async ({ request }) => {
   const form = await request.formData();
-  const email = String(form.get('email') ?? '').trim();
+  const email = normalizeEmail(String(form.get('email') ?? ''));
 
   if (!isValidEmail(email)) {
     return json({ ok: false, error: 'Please enter a valid email.' }, 400);
   }
 
-  const apiKey = import.meta.env.BUTTONDOWN_API_KEY;
-  if (!apiKey) {
+  try {
+    // Insert new, or reactivate a previously-unsubscribed email, in one call.
+    // created_at is omitted so existing rows keep their original timestamp.
+    const { error } = await getSupabase()
+      .from('subscribers')
+      .upsert({ email, unsubscribed_at: null }, { onConflict: 'email' });
+
+    if (error) {
+      console.error('subscribe: upsert failed', error);
+      return json({ ok: false, error: 'Something went wrong. Please try again.' }, 502);
+    }
+  } catch (err) {
+    console.error('subscribe: unexpected error', err);
     return json({ ok: false, error: 'Subscriptions are temporarily unavailable.' }, 500);
   }
 
-  const res = await fetch('https://api.buttondown.email/v1/subscribers', {
-    method: 'POST',
-    headers: { Authorization: `Token ${apiKey}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify(buildSubscribePayload(email)),
-  });
-
-  // 201 created; 400 often means "already subscribed" — treat as success for UX.
-  if (res.ok || res.status === 400) {
-    return json({ ok: true, message: "You're on the list! 🐾" }, 200);
-  }
-  return json({ ok: false, error: 'Something went wrong. Please try again.' }, 502);
+  return json({ ok: true, message: "You're on the list! 🐾" }, 200);
 };
 
 function json(body: unknown, status: number): Response {
