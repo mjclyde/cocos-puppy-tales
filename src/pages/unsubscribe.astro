@@ -1,0 +1,56 @@
+---
+export const prerender = false;
+import { verifyUnsubscribeToken } from '../lib/newsletter/unsubscribe-token';
+import { getSupabase } from '../lib/supabase';
+
+const token = Astro.url.searchParams.get('t') ?? undefined;
+const secret = import.meta.env.NEWSLETTER_UNSUBSCRIBE_SECRET ?? '';
+const email = verifyUnsubscribeToken(token, secret);
+
+let status: 'ok' | 'invalid' | 'error' = 'invalid';
+
+if (email) {
+  try {
+    // Idempotent: updates 0 rows if the email is unknown or already unsubscribed.
+    const { error } = await getSupabase()
+      .from('subscribers')
+      .update({ unsubscribed_at: new Date().toISOString() })
+      .eq('email', email);
+    status = error ? 'error' : 'ok';
+    if (error) console.error('unsubscribe: update failed', error);
+  } catch (err) {
+    console.error('unsubscribe: unexpected error', err);
+    status = 'error';
+  }
+}
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Unsubscribe — Coco's Puppy Tales</title>
+  </head>
+  <body style="font-family: system-ui, sans-serif; max-width: 32rem; margin: 4rem auto; padding: 0 1rem; line-height: 1.5;">
+    {status === 'ok' && (
+      <>
+        <h1>You've been unsubscribed 🐾</h1>
+        <p>You won't receive any more emails from Coco's Puppy Tales. We'll miss you!</p>
+      </>
+    )}
+    {status === 'invalid' && (
+      <>
+        <h1>This unsubscribe link is invalid</h1>
+        <p>The link may be incomplete or out of date. If you keep getting emails you don't want, just reply to one and we'll remove you.</p>
+      </>
+    )}
+    {status === 'error' && (
+      <>
+        <h1>Something went wrong</h1>
+        <p>We couldn't process your request right now. Please try again later, or reply to one of our emails and we'll remove you manually.</p>
+      </>
+    )}
+  </body>
+</html>
