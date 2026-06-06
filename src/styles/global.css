@@ -23,9 +23,13 @@ img { max-width: 100%; display: block; }
   background: var(--pop); color: var(--c-charcoal);
   font-weight: 900; text-decoration: none;
   padding: 0.7rem 1.4rem; border-radius: var(--radius-pill);
-  border: none; cursor: pointer; transition: transform 0.12s, filter 0.12s;
+  border: none; cursor: pointer;
+  box-shadow: 0 2px 8px rgba(43, 41, 38, 0.15);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
 }
-.btn:hover { transform: translateY(-2px); filter: brightness(1.03); }
+.btn:hover { transform: translateY(-2px); filter: brightness(1.03); box-shadow: 0 6px 16px rgba(43, 41, 38, 0.22); }
+.btn:active { transform: translateY(0); box-shadow: 0 1px 4px rgba(43, 41, 38, 0.2); }
+.btn:focus-visible { outline: 3px solid var(--c-navy); outline-offset: 2px; }
 .btn-secondary { background: var(--c-navy); color: var(--c-cream); }
 .chip {
   display: inline-flex; align-items: center; gap: 0.4rem;

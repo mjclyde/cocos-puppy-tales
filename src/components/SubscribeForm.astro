@@ -26,7 +26,10 @@
 </script>
 
 <style>
-  .subscribe { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
-  .subscribe input { padding: 0.7rem 1rem; border-radius: var(--radius-pill); border: 2px solid var(--c-navy); min-width: 240px; font: inherit; }
+  .subscribe { display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center; }
+  .subscribe input { padding: 0.85rem 1.25rem; border-radius: var(--radius-pill); border: 2px solid var(--c-navy); min-width: 240px; font: inherit; font-size: 1.05rem; transition: border-color 0.12s ease, box-shadow 0.12s ease; }
+  .subscribe input:focus-visible { outline: none; border-color: var(--c-honey); box-shadow: 0 0 0 3px rgba(233, 185, 73, 0.35); }
+  /* Scale the button up to match the input's heft; transparent 2px border keeps both pills the same height */
+  .subscribe .btn { border: 2px solid transparent; padding: 0.85rem 2.1rem; font-size: 1.05rem; }
   .msg { width: 100%; margin: 0.5rem 0 0; font-weight: 700; color: var(--c-sage); }
 </style>

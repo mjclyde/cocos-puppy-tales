@@ -6,7 +6,7 @@ const { images } = Astro.props;
 ---
 <div class="grid">
   {images.map((img) => (
-    <Image src={img.src} alt={img.alt} class="grid-img" widths={[300, 600]} sizes="(max-width: 700px) 50vw, 260px" />
+    <Image src={img.src} alt={img.alt} class="grid-img" widths={[300, 600]} sizes="(max-width: 700px) 50vw, 260px" format="webp" quality={72} loading="lazy" />
   ))}
 </div>
 <style>

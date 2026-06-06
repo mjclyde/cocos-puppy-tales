@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 Disallow: /admin
-Sitemap: https://cocospuppynursery.com/sitemap-index.xml
+Sitemap: https://cocos-puppy-tales.mjclyde.com/sitemap-index.xml

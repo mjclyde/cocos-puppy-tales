@@ -12,7 +12,7 @@ const { week, title, date, bellySizeComparison, bellyPhoto } = Astro.props;
 const dateStr = date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 ---
 <article class="card update">
-  {bellyPhoto && <Image src={bellyPhoto} alt={`Coco at week ${week}`} class="update-img" widths={[400, 800]} sizes="(max-width: 700px) 100vw, 320px" />}
+  {bellyPhoto && <Image src={bellyPhoto} alt={`Coco at week ${week}`} class="update-img" widths={[400, 800]} sizes="(max-width: 700px) 100vw, 320px" format="webp" quality={80} loading="lazy" />}
   <div class="update-body">
     <div class="meta">
       <span class="chip">Week {week}</span>

@@ -8,7 +8,7 @@ Homepage
 
 Hero Section
 
-🐾 Coco’s Puppy Nursery 🐾
+🐾 Coco’s Puppy Tales 🐾
 
 Follow the journey from pregnancy to puppy homecoming.
 
@@ -211,7 +211,7 @@ The feature I’d build first
 
 If your husband only has time for one thing:
 
-“The Puppy Nursery”
+“The Puppy Tales”
 
 A simple website with:
 
