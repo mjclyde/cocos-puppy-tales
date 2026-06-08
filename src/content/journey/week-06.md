@@ -1,6 +1,6 @@
 ---
 week: 6
-date: 2026-06-01
+date: 2026-06-01T06:00:00.000Z
 title: "Coco is starting to show!"
 bellySizeComparison: "Watermelon 🍉"
 published: true
