@@ -21,6 +21,14 @@ const journey = defineCollection({
     title: z.string(),
     bellyPhoto: image().optional(),
     bellySizeComparison: z.string().optional(),
+    puppyGrowth: z.object({
+      eyebrow: z.string().default('Tiny puppy update'),
+      title: z.string(),
+      facts: z.array(z.object({
+        label: z.string(),
+        text: z.string(),
+      })),
+    }).optional(),
     published: z.boolean().default(true),
   }),
 });

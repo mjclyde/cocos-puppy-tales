@@ -9,13 +9,31 @@ const links = [
   { href: '/waitlist', label: 'Waitlist' },
 ];
 const path = Astro.url.pathname;
+const normalizedPath = path.endsWith('/') && path !== '/' ? path.slice(0, -1) : path;
+const activeLink = links.find((link) => (
+  link.href === '/'
+    ? normalizedPath === '/'
+    : normalizedPath === link.href || normalizedPath.startsWith(`${link.href}/`)
+)) ?? links[0];
 ---
-<nav class="nav">
+<nav class="nav" data-nav>
   <div class="container nav-inner">
-    <a href="/" class="brand"><PawIcon /> Coco's Puppy Tales</a>
-    <ul>
+    <div class="nav-bar">
+      <a href="/" class="brand"><PawIcon /> <span class="brand-text">Coco's Puppy Tales</span></a>
+      <div class="mobile-controls">
+        <span class="current-section">{activeLink.label}</span>
+        <button class="nav-toggle" type="button" aria-label="Open navigation" aria-controls="site-nav-links" aria-expanded="false" data-nav-toggle>
+          <span class="hamburger" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </span>
+        </button>
+      </div>
+    </div>
+    <ul id="site-nav-links" class="nav-links">
       {links.map((l) => (
-        <li><a href={l.href} class={path === l.href ? 'active' : ''}>{l.label}</a></li>
+        <li><a href={l.href} class={`nav-link${activeLink.href === l.href ? ' active' : ''}`}>{l.label}</a></li>
       ))}
     </ul>
   </div>
@@ -23,9 +41,142 @@ const path = Astro.url.pathname;
 <style>
   .nav { background: var(--c-cream); border-bottom: 1px solid rgba(43,41,38,0.08); position: sticky; top: 0; z-index: 10; }
   .nav-inner { display: flex; align-items: center; justify-content: space-between; padding-top: 0.75rem; padding-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem; }
+  .nav-bar { display: contents; }
   .brand { display: inline-flex; align-items: center; gap: 0.45rem; font-weight: 900; color: var(--c-navy); text-decoration: none; font-size: 1.1rem; }
-  ul { display: flex; gap: 1rem; list-style: none; margin: 0; padding: 0; flex-wrap: wrap; }
-  a { color: var(--c-charcoal); text-decoration: none; font-weight: 700; font-size: 0.95rem; }
-  a.active { color: var(--c-brown); }
-  a:hover { color: var(--c-brown); }
+  .brand-text { overflow-wrap: anywhere; }
+  .mobile-controls { display: none; }
+  .nav-links { display: flex; gap: 1rem; list-style: none; margin: 0; padding: 0; flex-wrap: wrap; }
+  .nav-link { color: var(--c-charcoal); display: block; text-decoration: none; font-weight: 700; font-size: 0.95rem; }
+  .nav-link.active { color: var(--c-brown); }
+  .nav-link:hover { color: var(--c-brown); }
+  .nav-toggle {
+    align-items: center;
+    background: var(--c-navy);
+    border: 0;
+    border-radius: var(--radius-pill);
+    color: var(--c-cream);
+    cursor: pointer;
+    display: inline-flex;
+    flex: 0 0 auto;
+    height: 2.2rem;
+    justify-content: center;
+    padding: 0;
+    width: 2.2rem;
+  }
+  .nav-toggle:focus-visible { outline: 3px solid var(--c-honey); outline-offset: 2px; }
+  .hamburger {
+    display: grid;
+    gap: 0.22rem;
+    width: 1rem;
+  }
+  .hamburger span {
+    background: currentColor;
+    border-radius: 999px;
+    display: block;
+    height: 0.12rem;
+    transition: transform 0.16s ease, opacity 0.16s ease;
+  }
+  .nav.is-open .hamburger span:nth-child(1) { transform: translateY(0.34rem) rotate(45deg); }
+  .nav.is-open .hamburger span:nth-child(2) { opacity: 0; }
+  .nav.is-open .hamburger span:nth-child(3) { transform: translateY(-0.34rem) rotate(-45deg); }
+  @media (max-width: 760px) {
+    .nav-inner {
+      display: block;
+      padding-bottom: 0.65rem;
+      padding-top: 0.65rem;
+    }
+    .nav-bar {
+      align-items: center;
+      display: flex;
+      gap: 0.75rem;
+      justify-content: space-between;
+      width: 100%;
+    }
+    .brand {
+      font-size: 1rem;
+      min-width: 0;
+    }
+    .brand-text {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .mobile-controls {
+      align-items: center;
+      background: #fff;
+      border: 1px solid rgba(43, 41, 38, 0.1);
+      border-radius: var(--radius-pill);
+      box-shadow: 0 2px 10px rgba(43, 41, 38, 0.08);
+      display: inline-flex;
+      flex: 0 1 auto;
+      min-width: 0;
+      padding: 0.18rem 0.18rem 0.18rem 0.75rem;
+    }
+    .current-section {
+      color: var(--c-brown);
+      font-size: 0.88rem;
+      font-weight: 900;
+      line-height: 1;
+      max-width: 9rem;
+      overflow: hidden;
+      padding-right: 0.45rem;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .nav-links {
+      display: grid;
+      gap: 0.25rem;
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      padding-top: 0;
+      pointer-events: none;
+      transition: max-height 0.18s ease, opacity 0.14s ease, padding-top 0.18s ease, visibility 0.18s ease;
+      visibility: hidden;
+      width: 100%;
+    }
+    .nav.is-open .nav-links {
+      max-height: 24rem;
+      opacity: 1;
+      padding-top: 0.65rem;
+      pointer-events: auto;
+      visibility: visible;
+    }
+    .nav-link {
+      border-radius: 0.75rem;
+      padding: 0.6rem 0.75rem;
+    }
+    .nav-link.active {
+      background: color-mix(in srgb, var(--c-brown) 12%, #fff);
+    }
+    .nav-link:hover {
+      background: color-mix(in srgb, var(--c-sage) 12%, #fff);
+    }
+  }
+  @media (max-width: 390px) {
+    .current-section { max-width: 6.5rem; }
+  }
 </style>
+<script>
+  const nav = document.querySelector('[data-nav]');
+  const toggle = nav?.querySelector('[data-nav-toggle]');
+  const links = nav?.querySelectorAll('.nav-link');
+
+  const setOpen = (open: boolean) => {
+    nav?.classList.toggle('is-open', open);
+    toggle?.setAttribute('aria-expanded', String(open));
+    toggle?.setAttribute('aria-label', open ? 'Close navigation' : 'Open navigation');
+  };
+
+  toggle?.addEventListener('click', () => {
+    setOpen(!nav?.classList.contains('is-open'));
+  });
+
+  links?.forEach((link) => {
+    link.addEventListener('click', () => setOpen(false));
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') setOpen(false);
+  });
+</script>
