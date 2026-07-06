@@ -23,7 +23,7 @@ npx vitest run test/waitlist.test.ts
 npx vitest run -t "honeypot"
 ```
 
-Node >= 22.12.0 required.
+Node >= 24.0.0 required.
 
 ## Architecture
 

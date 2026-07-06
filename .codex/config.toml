@@ -1,8 +1,0 @@
-[mcp_servers.supabase]
-url = "https://mcp.supabase.com/mcp?project_ref=ppfjgpqjxbunfqrcdpaa"
-
-[mcp_servers.vercel]
-url = "https://mcp.vercel.com"
-
-[plugins."vercel@claude-plugins-official"]
-enabled = true
