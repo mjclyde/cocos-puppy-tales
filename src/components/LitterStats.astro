@@ -1,0 +1,17 @@
+---
+interface Props { count: number; boys: number; girls: number; }
+const { count, boys, girls } = Astro.props;
+---
+<div class="stat-band">
+  <div class="stat"><span class="n">{count}</span><span class="l">puppies</span></div>
+  <div class="stat stat-boy"><span class="n">{boys}</span><span class="l">boys</span></div>
+  <div class="stat stat-girl"><span class="n">{girls}</span><span class="l">girls</span></div>
+</div>
+<style>
+  .stat-band { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+  .stat { flex: 1; min-width: 92px; background: var(--c-navy); color: #fff; border-radius: var(--radius); text-align: center; padding: 0.9rem 0.5rem; }
+  .stat .n { display: block; font-size: 1.9rem; font-weight: 900; line-height: 1; }
+  .stat .l { display: block; margin-top: 0.3rem; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  .stat-boy { background: var(--c-boy); color: var(--c-charcoal); }
+  .stat-girl { background: var(--c-girl); color: var(--c-charcoal); }
+</style>
