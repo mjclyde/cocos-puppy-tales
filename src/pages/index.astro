@@ -2,28 +2,51 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/Hero.astro';
 import CountdownTimer from '../components/CountdownTimer.astro';
+import LitterStats from '../components/LitterStats.astro';
+import LitterAge from '../components/LitterAge.astro';
 import SubscribeForm from '../components/SubscribeForm.astro';
+import { Image } from 'astro:assets';
 import { getEntry } from 'astro:content';
 
 const coco = await getEntry('coco', 'coco');
 const site = await getEntry('site', 'config');
 const { dueDate, litterEstimate, flags } = site!.data;
+
+const litterEntry = await getEntry('litter', 'litter');
+const litter = litterEntry?.data.published ? litterEntry.data : null;
+const bornShort = litter ? litter.bornDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric' }) : '';
 ---
 <BaseLayout title="Coco's Puppy Tales">
   <Hero image={coco!.data.heroImage} name={coco!.data.name} />
 
-  <section class="section countdown-section">
-    <div class="container">
-      <h2>Expected arrival</h2>
-      <p>We're expecting {litterEstimate}! Here's the countdown:</p>
-      <CountdownTimer dueDate={dueDate} />
-    </div>
-  </section>
+  {litter ? (
+    <section class="section announce">
+      <div class="container announce-grid">
+        <div class="announce-copy">
+          <span class="chip">🎉 They're here!</span>
+          <h2>{litter.count} puppies have arrived</h2>
+          <p class="born">Born <strong>{bornShort}</strong> — a few days early 💕</p>
+          <LitterStats count={litter.count} boys={litter.boys} girls={litter.girls} />
+          <LitterAge bornDate={litter.bornDate} />
+          <div class="hero-cta"><a class="btn" href="/litter">Meet the litter →</a></div>
+        </div>
+        <Image src={litter.heroImage} alt="Coco nursing her nine newborn puppies" class="announce-img" widths={[400, 800]} sizes="(max-width: 700px) 100vw, 460px" format="webp" quality={80} />
+      </div>
+    </section>
+  ) : (
+    <section class="section countdown-section">
+      <div class="container">
+        <h2>Expected arrival</h2>
+        <p>We're expecting {litterEstimate}! Here's the countdown:</p>
+        <CountdownTimer dueDate={dueDate} />
+      </div>
+    </section>
+  )}
 
   <section class="section">
     <div class="container teasers">
+      <a class="card teaser" href="/litter"><h3>🐶 Meet the Litter</h3><p>Nine puppies have arrived! Meet the whole crew.</p></a>
       <a class="card teaser" href="/journey"><h3>📅 The Journey</h3><p>Weekly bump updates and Coco's pregnancy diary.</p></a>
-      <a class="card teaser" href="/coco"><h3>🐶 Meet Coco</h3><p>The best dog in the world. We may be biased.</p></a>
       <a class="card teaser" href="/waitlist"><h3>🧸 Waitlist</h3><p>Hoping to welcome a puppy? Start here.</p></a>
     </div>
   </section>
@@ -40,9 +63,15 @@ const { dueDate, litterEstimate, flags } = site!.data;
 </BaseLayout>
 
 <style>
+  .announce-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: center; }
+  .announce-copy h2 { font-size: clamp(1.7rem, 4vw, 2.6rem); margin: 0.5rem 0 0.3rem; }
+  .born { font-size: 1.1rem; margin: 0 0 1rem; }
+  .announce-copy :global(.stat-band) { margin-bottom: 0.5rem; }
+  .announce-img { border-radius: var(--radius); box-shadow: var(--shadow-lg); width: 100%; height: auto; object-fit: cover; }
+  .hero-cta { margin-top: 1.25rem; }
   .teasers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
   .teaser { text-decoration: none; color: inherit; transition: transform 0.12s, box-shadow 0.12s; }
   .teaser:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
   .subscribe-section { background: #fff; }
-  @media (max-width: 700px) { .teasers { grid-template-columns: 1fr; } }
+  @media (max-width: 700px) { .announce-grid { grid-template-columns: 1fr; } .teasers { grid-template-columns: 1fr; } }
 </style>
