@@ -14,6 +14,11 @@
   --accent:     var(--c-sage);
   --accent-2:   var(--c-brown);
   --pop:        var(--c-honey);
+  /* Litter announcement */
+  --c-boy:       #a9c2df;   /* pastel blue  — charcoal text ≈ 7.9:1 */
+  --c-girl:      #e7bccb;   /* pastel pink  — charcoal text ≈ 8.6:1 */
+  --c-sage-deep: #4f6b40;   /* CTA band bg  — white text ≈ 6:1 */
+  --eyebrow:     #935a30;   /* accessible brown for eyebrows ≈ 5.6:1 on white (was --c-brown 4.33:1) */
 
   --font-body: 'Nunito', system-ui, -apple-system, sans-serif;
   --radius: 16px;
