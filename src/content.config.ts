@@ -38,6 +38,27 @@ const breed = defineCollection({
   schema: z.object({ title: z.string() }),
 });
 
+const litter = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/litter' }),
+  schema: ({ image }) => z.object({
+    bornDate: z.coerce.date(),
+    count: z.number(),
+    boys: z.number(),
+    girls: z.number(),
+    weightRange: z.string(),
+    headline: z.string(),
+    heroImage: image(),
+    collars: z.array(z.object({
+      name: z.string(),
+      hex: z.string(),
+      sex: z.enum(['boy', 'girl']),
+      note: z.string().optional(),
+      photo: image(),
+    })),
+    published: z.boolean().default(true),
+  }),
+});
+
 const site = defineCollection({
   loader: file('./src/content/site/config.json'),
   schema: z.object({
@@ -52,4 +73,4 @@ const site = defineCollection({
   }),
 });
 
-export const collections = { coco, journey, breed, site };
+export const collections = { coco, journey, breed, site, litter };
