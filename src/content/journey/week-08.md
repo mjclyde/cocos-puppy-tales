@@ -8,4 +8,4 @@ published: true
 The wait is over — Coco's puppies arrived in the early morning of June 25th, a few days early!
 Nine healthy babies, five boys and four girls, all snuggled up with their very proud mama.
 
-[Meet the whole litter →](/litter)
+[Meet the whole litter →](/)

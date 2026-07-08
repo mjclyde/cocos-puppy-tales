@@ -1,55 +1,106 @@
 ---
+import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/Hero.astro';
 import CountdownTimer from '../components/CountdownTimer.astro';
 import LitterStats from '../components/LitterStats.astro';
 import LitterAge from '../components/LitterAge.astro';
+import PuppyCard from '../components/PuppyCard.astro';
+import GalleryGrid from '../components/GalleryGrid.astro';
 import SubscribeForm from '../components/SubscribeForm.astro';
-import { Image } from 'astro:assets';
-import { getEntry } from 'astro:content';
+import { getEntry, render } from 'astro:content';
+import type { ImageMetadata } from 'astro';
 
 const coco = await getEntry('coco', 'coco');
 const site = await getEntry('site', 'config');
 const { dueDate, litterEstimate, flags } = site!.data;
 
 const litterEntry = await getEntry('litter', 'litter');
+// Gate on `published`: the home page shows the birth announcement once the
+// litter is live, and falls back to the pre-birth countdown otherwise. `/`
+// can never redirect to itself, so both states must render here.
 const litter = litterEntry?.data.published ? litterEntry.data : null;
-const bornShort = litter ? litter.bornDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric' }) : '';
+const { Content } = litter && litterEntry ? await render(litterEntry) : { Content: null };
+const bornStr = litter ? litter.bornDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
+const pageDescription = litter
+  ? `Coco's ${litter.count} puppies have arrived! Meet the whole litter, born ${bornStr}.`
+  : undefined;
+const pageOgImage = litter ? '/og-litter.jpg' : undefined;
+
+const galleryFiles = import.meta.glob<{ default: ImageMetadata }>('../assets/litter/gallery/*.{jpg,jpeg,png,webp}', { eager: true });
+const galleryImages = Object.entries(galleryFiles).map(([path, m]) => {
+  const n = path.split('/').pop()!.replace(/\D/g, '');
+  return { src: m.default, alt: n ? `Coco's puppies — day ${Number(n)}` : "Coco's puppies in their first few days" };
+});
 ---
-<BaseLayout title="Coco's Puppy Tales">
-  <Hero image={coco!.data.heroImage} name={coco!.data.name} />
-
+<BaseLayout title="Coco's Puppy Tales" description={pageDescription} ogImage={pageOgImage}>
   {litter ? (
-    <section class="section announce">
-      <div class="container announce-grid">
-        <div class="announce-copy">
-          <span class="chip">🎉 They're here!</span>
-          <h2>{litter.count} puppies have arrived</h2>
-          <p class="born">Born <strong>{bornShort}</strong> — a few days early 💕</p>
-          <LitterStats count={litter.count} boys={litter.boys} girls={litter.girls} />
-          <LitterAge bornDate={litter.bornDate} />
-          <div class="hero-cta"><a class="btn" href="/litter">Meet the litter →</a></div>
+    <>
+      <section class="section hero-litter">
+        <div class="container hero-grid">
+          <div class="hero-header">
+            <h1>{litter.headline}</h1>
+            <p class="born">Born <strong>{bornStr}</strong></p>
+            <LitterAge bornDate={litter.bornDate} />
+          </div>
+          <Image src={litter.heroImage} alt="Coco nursing her nine newborn puppies" class="hero-img" widths={[400, 800]} sizes="(max-width: 700px) 100vw, 480px" format="webp" quality={80} />
+          <div class="hero-story">
+            <h2>They arrived a few days early!</h2>
+            {Content && <Content />}
+          </div>
         </div>
-        <Image src={litter.heroImage} alt="Coco nursing her nine newborn puppies" class="announce-img" widths={[400, 800]} sizes="(max-width: 700px) 100vw, 460px" format="webp" quality={80} />
-      </div>
-    </section>
-  ) : (
-    <section class="section countdown-section">
-      <div class="container">
-        <h2>Expected arrival</h2>
-        <p>We're expecting {litterEstimate}! Here's the countdown:</p>
-        <CountdownTimer dueDate={dueDate} />
-      </div>
-    </section>
-  )}
+      </section>
 
-  <section class="section">
-    <div class="container teasers">
-      <a class="card teaser" href="/litter"><h3>🐶 Meet the Litter</h3><p>Nine puppies have arrived! Meet the whole crew.</p></a>
-      <a class="card teaser" href="/journey"><h3>📅 The Journey</h3><p>Weekly bump updates and Coco's pregnancy diary.</p></a>
-      <a class="card teaser" href="/waitlist"><h3>🧸 Waitlist</h3><p>Hoping to welcome a puppy? Start here.</p></a>
-    </div>
-  </section>
+      <section class="section">
+        <div class="container">
+          <LitterStats count={litter.count} boys={litter.boys} girls={litter.girls} />
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container">
+          <p class="eyebrow">Meet the cast</p>
+          <h2>Nine collars, nine personalities</h2>
+          <div class="cast">
+            {litter.collars.map((c) => (
+              <PuppyCard name={c.name} hex={c.hex} sex={c.sex} note={c.note} photo={c.photo} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {galleryImages.length > 0 && (
+        <section class="section">
+          <div class="container">
+            <h2>First days</h2>
+            <GalleryGrid images={galleryImages} />
+          </div>
+        </section>
+      )}
+
+      <section class="section">
+        <div class="container">
+          <div class="cta">
+            <h2>Hoping to welcome one of these pups?</h2>
+            <p>Families on the waitlist get first pick as the puppies grow.</p>
+            <a class="btn" href="/waitlist">Join the waitlist →</a>
+          </div>
+        </div>
+      </section>
+    </>
+  ) : (
+    <>
+      <Hero image={coco!.data.heroImage} name={coco!.data.name} />
+
+      <section class="section countdown-section">
+        <div class="container">
+          <h2>Expected arrival</h2>
+          <p>We're expecting {litterEstimate}! Here's the countdown:</p>
+          <CountdownTimer dueDate={dueDate} />
+        </div>
+      </section>
+    </>
+  )}
 
   {flags.showSubscribe && (
     <section class="section subscribe-section">
@@ -63,15 +114,45 @@ const bornShort = litter ? litter.bornDate.toLocaleDateString('en-US', { month: 
 </BaseLayout>
 
 <style>
-  .announce-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: center; }
-  .announce-copy h2 { font-size: clamp(1.7rem, 4vw, 2.6rem); margin: 0.5rem 0 0.3rem; }
-  .born { font-size: 1.1rem; margin: 0 0 1rem; }
-  .announce-copy :global(.stat-band) { margin-bottom: 0.5rem; }
-  .announce-img { border-radius: var(--radius); box-shadow: var(--shadow-lg); width: 100%; height: auto; object-fit: cover; }
-  .hero-cta { margin-top: 1.25rem; }
-  .teasers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
-  .teaser { text-decoration: none; color: inherit; transition: transform 0.12s, box-shadow 0.12s; }
-  .teaser:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+  .hero-litter { background: var(--c-cream); }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+      "header image"
+      "story  image";
+    gap: 1.25rem 2rem;
+    align-items: start;
+  }
+  .hero-header { grid-area: header; }
+  .hero-img {
+    grid-area: image;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+  }
+  .hero-story { grid-area: story; }
+  .hero-header h1 { font-size: clamp(2rem, 5vw, 3rem); margin: 0.6rem 0 0.4rem; }
+  .born { font-size: 1.15rem; margin: 0; }
+  .hero-story h2 { font-size: clamp(1.3rem, 3vw, 1.7rem); margin: 0 0 0.5rem; }
+  .hero-story :global(p) { font-size: 1.02rem; }
+  .eyebrow { color: var(--eyebrow); font-size: 0.8rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 0.35rem; }
+  .cast { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; }
+  .cta { background: var(--c-sage-deep); color: #fff; border-radius: var(--radius); padding: 2rem; text-align: center; }
+  .cta h2 { color: #fff; }
+  .cta p { margin: 0.25rem 0 1.25rem; }
   .subscribe-section { background: #fff; }
-  @media (max-width: 700px) { .announce-grid { grid-template-columns: 1fr; } .teasers { grid-template-columns: 1fr; } }
+  @media (max-width: 700px) {
+    .hero-grid {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto;
+      grid-template-areas:
+        "header"
+        "image"
+        "story";
+    }
+  }
 </style>
