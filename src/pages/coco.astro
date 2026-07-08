@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { Image } from 'astro:assets';
+import ZoomableImage from '../components/ZoomableImage.astro';
 import { getEntry, render } from 'astro:content';
 
 const coco = await getEntry('coco', 'coco');
@@ -9,8 +10,10 @@ const { name, breed, heroImage, personalityTraits, healthFacts, pedigree } = coc
 ---
 <BaseLayout title={`Meet ${name} — Coco's Puppy Tales`} description={`Meet ${name}, our ${breed}.`}>
   <section class="section">
-    <div class="container coco-grid">
-      <Image src={heroImage} alt={`${name} the ${breed}`} class="coco-img" widths={[400, 800]} sizes="(max-width: 700px) 100vw, 420px" format="webp" quality={80} />
+    <div class="container coco-grid pswp-gallery">
+      <ZoomableImage src={heroImage}>
+        <Image src={heroImage} alt={`${name} the ${breed}`} class="coco-img" widths={[400, 800]} sizes="(max-width: 700px) 100vw, 420px" format="webp" quality={80} />
+      </ZoomableImage>
       <div>
         <span class="chip">{breed}</span>
         <h1>Meet {name}</h1>

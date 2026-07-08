@@ -7,6 +7,7 @@ import LitterStats from '../components/LitterStats.astro';
 import LitterAge from '../components/LitterAge.astro';
 import PuppyCard from '../components/PuppyCard.astro';
 import GalleryGrid from '../components/GalleryGrid.astro';
+import ZoomableImage from '../components/ZoomableImage.astro';
 import SubscribeForm from '../components/SubscribeForm.astro';
 import { getEntry, render } from 'astro:content';
 import type { ImageMetadata } from 'astro';
@@ -37,13 +38,15 @@ const galleryImages = Object.entries(galleryFiles).map(([path, m]) => {
   {litter ? (
     <>
       <section class="section hero-litter">
-        <div class="container hero-grid">
+        <div class="container hero-grid pswp-gallery">
           <div class="hero-header">
             <h1>{litter.headline}</h1>
             <p class="born">Born <strong>{bornStr}</strong></p>
             <LitterAge bornDate={litter.bornDate} />
           </div>
-          <Image src={litter.heroImage} alt="Coco nursing her nine newborn puppies" class="hero-img" widths={[400, 800]} sizes="(max-width: 700px) 100vw, 480px" format="webp" quality={80} />
+          <ZoomableImage src={litter.heroImage}>
+            <Image src={litter.heroImage} alt="Coco nursing her nine newborn puppies" class="hero-img" widths={[400, 800]} sizes="(max-width: 700px) 100vw, 480px" format="webp" quality={80} />
+          </ZoomableImage>
           <div class="hero-story">
             <h2>They arrived a few days early!</h2>
             {Content && <Content />}
@@ -61,7 +64,7 @@ const galleryImages = Object.entries(galleryFiles).map(([path, m]) => {
         <div class="container">
           <p class="eyebrow">Meet the cast</p>
           <h2>Nine collars, nine personalities</h2>
-          <div class="cast">
+          <div class="cast pswp-gallery">
             {litter.collars.map((c) => (
               <PuppyCard name={c.name} hex={c.hex} sex={c.sex} note={c.note} photo={c.photo} />
             ))}

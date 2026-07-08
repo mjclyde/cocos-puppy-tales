@@ -20,6 +20,26 @@ test('home page shows the litter, birth story, cast, and nav works', async ({ pa
   await expect(page.getByRole('heading', { name: 'The Journey' })).toBeVisible();
 });
 
+test('clicking a photo opens the lightbox, navigates, and closes', async ({ page }) => {
+  await page.goto('/');
+  // Open the lightbox from the first puppy-card photo (the cast is one group of 9).
+  await page.locator('.cast .pup-img').first().click();
+  const pswp = page.locator('.pswp');
+  await expect(pswp).toBeVisible();
+  await expect(page.locator('.pswp img.pswp__img').first()).toBeVisible();
+  // Counter proves grouping; asserting it also waits out the open animation.
+  const counter = page.locator('.pswp__counter');
+  await expect(counter).toHaveText(/1\s*\/\s*9/);
+  // Step to the next photo within the group.
+  await page.getByRole('button', { name: 'Next' }).click();
+  await expect(counter).toHaveText(/2\s*\/\s*9/);
+  // Let the slide transition settle — PhotoSwipe drops a close issued mid-animation.
+  await page.waitForTimeout(500);
+  // Close with Escape — the lightbox is no longer open.
+  await page.keyboard.press('Escape');
+  await expect(page.locator('.pswp--open')).toHaveCount(0);
+});
+
 test('journey birth capstone links back to the home litter', async ({ page }) => {
   await page.goto('/journey');
   await expect(page.getByRole('heading', { name: /They're here!/ })).toBeVisible();

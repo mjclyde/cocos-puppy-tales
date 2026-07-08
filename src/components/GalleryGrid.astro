@@ -1,12 +1,15 @@
 ---
 import { Image } from 'astro:assets';
+import ZoomableImage from './ZoomableImage.astro';
 import type { ImageMetadata } from 'astro';
 interface Props { images: { src: ImageMetadata; alt: string }[]; }
 const { images } = Astro.props;
 ---
-<div class="grid">
+<div class="grid pswp-gallery">
   {images.map((img) => (
-    <Image src={img.src} alt={img.alt} class="grid-img" widths={[300, 600]} sizes="(max-width: 700px) 50vw, 260px" format="webp" quality={72} loading="lazy" />
+    <ZoomableImage src={img.src}>
+      <Image src={img.src} alt={img.alt} class="grid-img" widths={[300, 600]} sizes="(max-width: 700px) 50vw, 260px" format="webp" quality={72} loading="lazy" />
+    </ZoomableImage>
   ))}
 </div>
 <style>

@@ -38,3 +38,8 @@ img { max-width: 100%; display: block; }
 }
 .card { background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); padding: 1.25rem; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+/* Click-to-enlarge (PhotoSwipe). The anchor is layout-transparent so the wrapped
+   image keeps all its own styling; the image just gains a zoom-in affordance. */
+.pswp-item { display: contents; }
+.pswp-item img { cursor: zoom-in; }

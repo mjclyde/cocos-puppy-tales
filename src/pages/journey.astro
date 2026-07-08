@@ -17,11 +17,13 @@ const rendered = await Promise.all(updates.map(async (u) => ({
       <h1>The Journey</h1>
       <p>Weekly updates from Coco's pregnancy — newest first.</p>
       {rendered.length === 0 && <p>Updates are coming soon. 🐾</p>}
-      {rendered.map(({ data, Content }) => (
-        <UpdateCard week={data.week} title={data.title} date={data.date} bellySizeComparison={data.bellySizeComparison} bellyPhoto={data.bellyPhoto} puppyGrowth={data.puppyGrowth}>
-          <Content />
-        </UpdateCard>
-      ))}
+      <div class="pswp-gallery">
+        {rendered.map(({ data, Content }) => (
+          <UpdateCard week={data.week} title={data.title} date={data.date} bellySizeComparison={data.bellySizeComparison} bellyPhoto={data.bellyPhoto} puppyGrowth={data.puppyGrowth}>
+            <Content />
+          </UpdateCard>
+        ))}
+      </div>
     </div>
   </section>
 </BaseLayout>

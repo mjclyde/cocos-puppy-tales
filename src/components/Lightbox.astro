@@ -1,0 +1,19 @@
+---
+// Site-wide image lightbox (PhotoSwipe v5). Rendered once in BaseLayout so every
+// page gets it. Binds to each `.pswp-gallery` group on the page; the PhotoSwipe
+// core module is lazy-loaded on first open via the dynamic `pswpModule` import.
+---
+<script>
+  import PhotoSwipeLightbox from 'photoswipe/lightbox';
+  import PhotoSwipe from 'photoswipe';
+  import 'photoswipe/style.css';
+
+  if (document.querySelector('.pswp-gallery')) {
+    const lightbox = new PhotoSwipeLightbox({
+      gallery: '.pswp-gallery',
+      children: 'a.pswp-item',
+      pswpModule: PhotoSwipe,
+    });
+    lightbox.init();
+  }
+</script>
