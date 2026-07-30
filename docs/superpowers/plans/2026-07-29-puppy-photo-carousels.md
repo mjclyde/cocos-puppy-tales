@@ -1497,11 +1497,14 @@ Expected: `0 errors`; all vitest suites pass; build succeeds; all Playwright tes
 - [ ] **Step 6: Confirm the built output actually has the photos**
 
 Run:
+The `@astrojs/vercel` adapter nests static output under `dist/client/`, not `dist/`:
+
 ```bash
-ls dist/_astro/*.webp | wc -l
+ls dist/client/_astro/*.webp | wc -l
 ```
 
-Expected: several hundred (each photo generates thumbnail widths plus a 1600px lightbox variant). A number under 100 means the glob missed the tree.
+Expected: several hundred — **780 as built** (each photo generates thumbnail widths plus a 1600px
+lightbox variant). A number under 100 means the glob missed the tree.
 
 - [ ] **Step 7: Commit**
 
