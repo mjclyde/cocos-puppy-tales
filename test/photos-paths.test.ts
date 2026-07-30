@@ -5,6 +5,7 @@ import {
   compareShoots,
   comparePhotos,
   groupBySubject,
+  withCoverFirst,
   assertKnownSubjects,
   shootLabel,
   photoAlt,
@@ -132,6 +133,40 @@ describe('groupBySubject', () => {
 });
 
 const COLLARS = ['Blue', 'Black', 'Brown', 'Yellow', 'Orange', 'Pink', 'Purple', 'Red', 'Green'];
+
+describe('withCoverFirst', () => {
+  const blue = [
+    { shoot: '2026-07-24', subject: 'blue', file: 'blue-01.jpg' },
+    { shoot: '2026-07-24', subject: 'blue', file: 'blue-02.jpg' },
+    { shoot: '2026-07-23', subject: 'blue', file: 'blue-01.jpg' },
+    { shoot: '2026-07-23', subject: 'blue', file: 'blue-02.jpg' },
+    { shoot: '2026-07-07', subject: 'blue', file: 'blue-01.jpg' },
+  ];
+
+  it('moves the cover shoot to the front, keeping the order within each part', () => {
+    expect(withCoverFirst(blue, '2026-07-23').map((p) => `${p.shoot}/${p.file}`)).toEqual([
+      '2026-07-23/blue-01.jpg',
+      '2026-07-23/blue-02.jpg',
+      '2026-07-24/blue-01.jpg',
+      '2026-07-24/blue-02.jpg',
+      '2026-07-07/blue-01.jpg',
+    ]);
+  });
+
+  it('leaves the order alone when no cover shoot is configured', () => {
+    expect(withCoverFirst(blue, undefined)).toEqual(blue);
+  });
+
+  it('leaves the order alone when the cover shoot matches nothing', () => {
+    expect(withCoverFirst(blue, '2026-01-01')).toEqual(blue);
+  });
+
+  it('does not mutate the input', () => {
+    const snapshot = blue.map((p) => `${p.shoot}/${p.file}`);
+    withCoverFirst(blue, '2026-07-23');
+    expect(blue.map((p) => `${p.shoot}/${p.file}`)).toEqual(snapshot);
+  });
+});
 
 describe('assertKnownSubjects', () => {
   const allSubjects = [...COLLARS.map((c) => c.toLowerCase()), 'group', 'coco', 'first-days'];

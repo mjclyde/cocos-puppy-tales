@@ -68,6 +68,22 @@ export function groupBySubject<T extends PhotoRef>(refs: T[]): Record<string, T[
 }
 
 /**
+ * Float one shoot to the front, leaving the order within each part alone.
+ *
+ * The cast cards lead with the portrait shoot — the held-up headshots that read
+ * as "this is who this puppy is" — while everything behind the cover stays in
+ * newest-first order. Returns a copy; a missing or unmatched `coverShoot` is a
+ * no-op, so the cards simply fall back to newest-first.
+ */
+export function withCoverFirst<T extends PhotoRef>(photos: T[], coverShoot?: string): T[] {
+  if (!coverShoot) return [...photos];
+  return [
+    ...photos.filter((photo) => photo.shoot === coverShoot),
+    ...photos.filter((photo) => photo.shoot !== coverShoot),
+  ];
+}
+
+/**
  * Fail the build when the photo tree and `litter.md` disagree. A typo'd folder
  * would otherwise silently empty a puppy's card, which is invisible in a diff.
  */

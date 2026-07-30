@@ -9,11 +9,11 @@ import PuppyCard from '../components/PuppyCard.astro';
 import ZoomableImage from '../components/ZoomableImage.astro';
 import SubscribeForm from '../components/SubscribeForm.astro';
 import { getEntry, render } from 'astro:content';
-import { photosBySubject } from '../lib/photos';
+import { photosBySubject, withCoverFirst } from '../lib/photos';
 
 const coco = await getEntry('coco', 'coco');
 const site = await getEntry('site', 'config');
-const { dueDate, litterEstimate, flags } = site!.data;
+const { dueDate, litterEstimate, flags, cardCoverShoot } = site!.data;
 
 const litterEntry = await getEntry('litter', 'litter');
 // Gate on `published`: the home page shows the birth announcement once the
@@ -68,7 +68,7 @@ const photos = photosBySubject((litterEntry?.data.collars ?? []).map((c) => c.na
                 hex={c.hex}
                 sex={c.sex}
                 note={c.note}
-                photos={photos[c.name.toLowerCase()] ?? []}
+                photos={withCoverFirst(photos[c.name.toLowerCase()] ?? [], cardCoverShoot)}
               />
             ))}
           </div>

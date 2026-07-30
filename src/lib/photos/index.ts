@@ -7,7 +7,7 @@ import {
   type PhotoRef,
 } from './paths';
 
-export { NON_PUPPY_SUBJECTS, SECTION_TITLES } from './paths';
+export { NON_PUPPY_SUBJECTS, SECTION_TITLES, withCoverFirst } from './paths';
 export type { PhotoRef, NonPuppySubject } from './paths';
 
 export interface Photo extends PhotoRef {

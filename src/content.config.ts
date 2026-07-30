@@ -65,6 +65,8 @@ const site = defineCollection({
     litterEstimate: z.string(),
     contactEmail: z.string().email(),
     socialLinks: z.array(z.object({ label: z.string(), url: z.string().url() })).default([]),
+    // Shoot folder whose photos lead each cast card. Omit to fall back to newest-first.
+    cardCoverShoot: z.string().optional(),
     flags: z.object({
       showGallery: z.boolean().default(true),
       showSubscribe: z.boolean().default(true),

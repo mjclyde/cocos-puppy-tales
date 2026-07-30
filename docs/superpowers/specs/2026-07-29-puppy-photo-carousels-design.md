@@ -63,9 +63,20 @@ error. This is the only protection against a typo'd folder quietly emptying a pu
 
 ### Shoot ordering
 
-Within a subject, shoots sort **newest first**; undated shoots sort last. So Blue's carousel runs
-07-24 → 07-23 → 07-07, ending on his newborn portrait, and Coco's gallery section runs 07-24 →
-`pre-litter`. A new dated folder lands in the right position automatically.
+Within a subject, shoots sort **newest first**; undated shoots sort last. Coco's gallery section runs
+07-24 → `pre-litter`. A new dated folder lands in the right position automatically.
+
+**The cast cards override the front of that order with a cover shoot.** Newest-first alone put a
+07-24 basket shot on the front of every card, but the 07-23 shoot — each puppy held up at golden
+hour — is what reads as "this is who this puppy is," and leading with it was the point of the
+original request. `site/config.json`'s `cardCoverShoot` names that shoot; `withCoverFirst` floats its
+photos to the front and leaves everything behind them newest-first. So Blue's card runs
+07-23 → 07-24 → 07-07, still ending on his newborn portrait.
+
+The setting is optional and lives in content rather than code, so re-shooting the litter is a
+one-line content edit. Omitting it falls back to plain newest-first. **Only the cards apply it** —
+the gallery's per-puppy sections stay newest-first, since that view is a chronological browse rather
+than an identity shot.
 
 ### Migration from the current layout
 
