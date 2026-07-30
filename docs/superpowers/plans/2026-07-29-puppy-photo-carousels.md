@@ -271,7 +271,7 @@ export function groupBySubject<T extends PhotoRef>(refs: T[]): Record<string, T[
 - [ ] **Step 4: Run the tests to verify they pass**
 
 Run: `npx vitest run test/photos-paths.test.ts`
-Expected: PASS — 15 tests.
+Expected: PASS — 16 tests.
 
 - [ ] **Step 5: Write the failing tests for validation and alt text**
 
@@ -438,7 +438,7 @@ export function photoAlt(ref: PhotoRef, collarDisplayName?: string): string {
 - [ ] **Step 8: Run the full unit suite**
 
 Run: `npm test`
-Expected: PASS — all existing suites plus 29 tests in `photos-paths`.
+Expected: PASS — all existing suites plus 30 tests in `photos-paths`.
 
 - [ ] **Step 9: Type-check**
 
