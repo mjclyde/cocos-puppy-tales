@@ -22,16 +22,19 @@ test('home page shows the litter, birth story, cast, and nav works', async ({ pa
 
 test('clicking a photo opens the lightbox, navigates, and closes', async ({ page }) => {
   await page.goto('/');
-  // Open the lightbox from the first puppy-card photo (the cast is one group of 9).
-  await page.locator('.cast .pup-img').first().click();
+  // Open the lightbox from the first puppy card's carousel (Blue collar, first
+  // in litter.md — now its own PhotoSwipe group of 9, since each carousel is a group).
+  await page.locator('.cast .slide-img').first().click();
   const pswp = page.locator('.pswp');
   await expect(pswp).toBeVisible();
   await expect(page.locator('.pswp img.pswp__img').first()).toBeVisible();
   // Counter proves grouping; asserting it also waits out the open animation.
   const counter = page.locator('.pswp__counter');
   await expect(counter).toHaveText(/1\s*\/\s*9/);
-  // Step to the next photo within the group.
-  await page.getByRole('button', { name: 'Next' }).click();
+  // Step to the next photo within the group. Scoped to the open lightbox:
+  // the carousels behind it now also have "Next photo of <name>" buttons,
+  // which collide with an unscoped `{ name: 'Next' }` substring match.
+  await pswp.getByRole('button', { name: 'Next' }).click();
   await expect(counter).toHaveText(/2\s*\/\s*9/);
   // Let the slide transition settle — PhotoSwipe drops a close issued mid-animation.
   await page.waitForTimeout(500);
@@ -63,4 +66,34 @@ test('unsubscribe page shows an invalid-link message for a bogus token', async (
   // without touching the database.
   await page.goto('/unsubscribe?t=bogus');
   await expect(page.getByRole('heading', { name: 'This unsubscribe link is invalid' })).toBeVisible();
+});
+
+test('a cast card carousels through that puppy\'s photos', async ({ page }) => {
+  await page.goto('/');
+  const card = page.locator('article.pup', { hasText: 'Blue collar' });
+
+  await expect(card.getByText(/^1 \/ \d+$/)).toBeVisible();
+
+  // Controls are hover-revealed with `pointer-events: none`, so hover first —
+  // otherwise Playwright's actionability check fails on the hit test.
+  await card.hover();
+  await card.getByRole('button', { name: 'Next photo of Blue' }).click();
+  await expect(card.getByText(/^2 \/ \d+$/)).toBeVisible();
+
+  await card.getByRole('button', { name: 'Previous photo of Blue' }).click();
+  await expect(card.getByText(/^1 \/ \d+$/)).toBeVisible();
+});
+
+test('the carousel wraps backwards from the first photo to the last', async ({ page }) => {
+  await page.goto('/');
+  const card = page.locator('article.pup', { hasText: 'Black collar' });
+
+  await card.hover();
+  await card.getByRole('button', { name: 'Previous photo of Black' }).click();
+  await expect(card.getByText('6 / 6')).toBeVisible();
+});
+
+test('the home page no longer shows the first-days grid', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByRole('heading', { name: 'First days' })).toHaveCount(0);
 });

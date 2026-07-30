@@ -7,15 +7,15 @@ weightRange: "14–20 oz"
 headline: "Meet Coco's puppies"
 heroImage: ../../assets/litter/hero.jpg
 collars:
-  - { name: "Blue",   hex: "#3b6fd6", sex: boy,  note: "First born — led the way.",              photo: ../../assets/litter/collars/blue.jpg }
-  - { name: "Black",  hex: "#2a2a2a", sex: boy,  note: "The dramatic one — growing fastest.",     photo: ../../assets/litter/collars/black.jpg }
-  - { name: "Brown",  hex: "#8a5a2b", sex: boy,  note: "Aka \"Potato\" — loves to sleep.",        photo: ../../assets/litter/collars/brown.jpg }
-  - { name: "Yellow", hex: "#e0b031", sex: boy,  note: "Has the most unique markings.",           photo: ../../assets/litter/collars/yellow.jpg }
-  - { name: "Orange", hex: "#e8863b", sex: boy,  note: "First to open his eyes.",                 photo: ../../assets/litter/collars/orange.jpg }
-  - { name: "Pink",   hex: "#e58fb0", sex: girl, note: "Coco's little mini-me.",                  photo: ../../assets/litter/collars/pink.jpg }
-  - { name: "Purple", hex: "#7b4fc9", sex: girl, note: "Last to arrive, worth the wait.",         photo: ../../assets/litter/collars/purple.jpg }
-  - { name: "Red",    hex: "#d24a45", sex: girl, note: "Sweet and small — nicknamed \"Ruby.\"",  photo: ../../assets/litter/collars/red.jpg }
-  - { name: "Green",  hex: "#5a9e4f", sex: girl, note: "Little, quiet & unbearably cute.",        photo: ../../assets/litter/collars/green.jpg }
+  - { name: "Blue",   hex: "#3b6fd6", sex: boy,  note: "First born — led the way." }
+  - { name: "Black",  hex: "#2a2a2a", sex: boy,  note: "The dramatic one — growing fastest." }
+  - { name: "Brown",  hex: "#8a5a2b", sex: boy,  note: "Aka \"Potato\" — loves to sleep." }
+  - { name: "Yellow", hex: "#e0b031", sex: boy,  note: "Has the most unique markings." }
+  - { name: "Orange", hex: "#e8863b", sex: boy,  note: "First to open his eyes." }
+  - { name: "Pink",   hex: "#e58fb0", sex: girl, note: "Coco's little mini-me." }
+  - { name: "Purple", hex: "#7b4fc9", sex: girl, note: "Last to arrive, worth the wait." }
+  - { name: "Red",    hex: "#d24a45", sex: girl, note: "Sweet and small — nicknamed \"Ruby.\"" }
+  - { name: "Green",  hex: "#5a9e4f", sex: girl, note: "Little, quiet & unbearably cute." }
 published: true
 ---
 

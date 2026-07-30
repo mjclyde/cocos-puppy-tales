@@ -1,0 +1,176 @@
+---
+// A single puppy's photos in a square frame. Slides are plain hidden/shown
+// elements rather than a scroller so hidden ones are never fetched.
+//
+// The wrapper is the PhotoSwipe group, so the lightbox is scoped to this one
+// puppy. Hidden slides stay in the DOM and are still queried by PhotoSwipe,
+// which is what makes the full-screen view the whole set.
+import { Image } from 'astro:assets';
+import ZoomableImage from './ZoomableImage.astro';
+import type { Photo } from '../lib/photos';
+
+interface Props {
+  name: string;
+  photos: Photo[];
+}
+
+const { name, photos } = Astro.props;
+const many = photos.length > 1;
+---
+<div
+  class="carousel pswp-gallery"
+  data-carousel
+  role="group"
+  aria-roledescription="carousel"
+  aria-label={`${name} collar photos`}
+>
+  <div class="frame">
+    {photos.map((photo, i) => (
+      <div class="slide" data-slide hidden={i !== 0}>
+        <ZoomableImage src={photo.src}>
+          <Image
+            src={photo.src}
+            alt={photo.alt}
+            class="slide-img"
+            widths={[240, 480]}
+            sizes="(max-width: 700px) 50vw, 240px"
+            format="webp"
+            quality={78}
+            loading="lazy"
+          />
+        </ZoomableImage>
+      </div>
+    ))}
+
+    {many && (
+      <>
+        <button class="nav prev" type="button" data-prev hidden aria-label={`Previous photo of ${name}`}>
+          <span aria-hidden="true">‹</span>
+        </button>
+        <button class="nav next" type="button" data-next hidden aria-label={`Next photo of ${name}`}>
+          <span aria-hidden="true">›</span>
+        </button>
+        <span class="counter" data-counter aria-hidden="true">1 / {photos.length}</span>
+      </>
+    )}
+  </div>
+
+  {many && (
+    <p class="visually-hidden" aria-live="polite" data-live>Photo 1 of {photos.length}</p>
+  )}
+</div>
+
+<style>
+  .carousel { position: relative; }
+  .frame { position: relative; aspect-ratio: 1 / 1; overflow: hidden; background: #e8e0d2; }
+  .slide { height: 100%; }
+  /* `.pswp-item` is `display: contents`, so the image is the frame's layout child. */
+  .slide-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  /* Beat the `.slide { height }` rule — `[hidden]` alone loses to any display value. */
+  .slide[hidden], .nav[hidden] { display: none; }
+
+  .nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 2rem;
+    height: 2rem;
+    display: grid;
+    place-items: center;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: rgba(255, 255, 255, 0.88);
+    color: var(--c-charcoal);
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(43, 41, 38, 0.28);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+  }
+  .prev { left: 0.45rem; }
+  .next { right: 0.45rem; }
+  .nav:focus-visible { outline: 3px solid var(--c-navy); outline-offset: 2px; }
+
+  .counter {
+    position: absolute;
+    right: 0.5rem;
+    bottom: 0.5rem;
+    background: rgba(43, 41, 38, 0.66);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 800;
+    padding: 0.15rem 0.5rem;
+    border-radius: var(--radius-pill);
+    opacity: 0;
+    transition: opacity 0.15s ease;
+  }
+
+  /* Controls appear only once the script has wired them up. */
+  [data-ready] .counter { opacity: 1; }
+
+  @media (hover: hover) {
+    [data-ready]:hover .nav,
+    [data-ready]:focus-within .nav { opacity: 1; pointer-events: auto; }
+  }
+
+  /* No hover on touch, so a hover-only control is an invisible control. */
+  @media (hover: none) {
+    [data-ready] .nav { opacity: 1; pointer-events: auto; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nav, .counter { transition: none; }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-carousel]').forEach((carousel) => {
+    const slides = [...carousel.querySelectorAll<HTMLElement>('[data-slide]')];
+    if (slides.length < 2) return;
+
+    const prev = carousel.querySelector<HTMLButtonElement>('[data-prev]');
+    const next = carousel.querySelector<HTMLButtonElement>('[data-next]');
+    const counter = carousel.querySelector<HTMLElement>('[data-counter]');
+    const live = carousel.querySelector<HTMLElement>('[data-live]');
+    if (!prev || !next || !counter || !live) return;
+
+    let index = 0;
+
+    const show = (n: number) => {
+      index = (n + slides.length) % slides.length;
+      slides.forEach((slide, i) => slide.toggleAttribute('hidden', i !== index));
+      counter.textContent = `${index + 1} / ${slides.length}`;
+      live.textContent = `Photo ${index + 1} of ${slides.length}`;
+    };
+
+    prev.hidden = false;
+    next.hidden = false;
+    prev.addEventListener('click', () => show(index - 1));
+    next.addEventListener('click', () => show(index + 1));
+
+    carousel.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowLeft') { event.preventDefault(); show(index - 1); }
+      if (event.key === 'ArrowRight') { event.preventDefault(); show(index + 1); }
+    });
+
+    let startX: number | null = null;
+    carousel.addEventListener('pointerdown', (event) => { startX = event.clientX; });
+    carousel.addEventListener('pointerup', (event) => {
+      if (startX === null) return;
+      const dx = event.clientX - startX;
+      startX = null;
+      if (Math.abs(dx) <= 30) return;
+      show(dx < 0 ? index + 1 : index - 1);
+      // A swipe must not also open the lightbox: `click` fires after `pointerup`.
+      carousel.addEventListener(
+        'click',
+        (click) => { click.preventDefault(); click.stopPropagation(); },
+        { capture: true, once: true },
+      );
+    });
+
+    carousel.dataset.ready = '';
+  });
+</script>
