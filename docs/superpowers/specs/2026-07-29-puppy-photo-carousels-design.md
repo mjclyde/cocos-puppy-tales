@@ -137,12 +137,20 @@ No Vite, no Astro, no `ImageMetadata`. Operates on path strings and plain record
 Runs `import.meta.glob('../../assets/photos/**/*.jpg', { eager: true })`, feeds the paths through
 `paths.ts`, and exports:
 
-- `photosBySubject: Record<string, Photo[]>` where `Photo = { src: ImageMetadata; alt: string; shoot: string }`
-- `getPuppyPhotos(collarName)` — that puppy's photos, newest shoot first
-- `nonPuppySections()` — group / Coco / first-days, in display order
+- `interface Photo extends PhotoRef { src: ImageMetadata; alt: string }`
+- `photosBySubject(collarNames: string[]): Record<string, Photo[]>` — every photo grouped by
+  subject, each list newest shoot first, validated against `collarNames` on the way through
+- re-exports of `NON_PUPPY_SUBJECTS`, `SECTION_TITLES`, and the `PhotoRef` / `NonPuppySubject` types,
+  so pages import from one place
 
 Splitting these two ways means the ordering and validation logic is testable with plain strings,
 with no need to mock Vite's glob.
+
+**Not memoized.** An earlier draft cached the result in a module-level variable. That cache was
+checked before `collarNames` was read, so validation ran only on the first call — fine for a
+one-shot `astro build`, but `astro dev` keeps the module alive across requests, and a collar renamed
+mid-session would then silently render an empty card, which is precisely what the validation exists
+to prevent. Grouping 137 items costs microseconds, so the cache bought nothing worth that risk.
 
 ### Generated alt text
 
@@ -268,6 +276,17 @@ The `litter/gallery/*` glob in `index.astro` is deleted along with it.
 - `groupBySubject`: shoot order first, filename order within a shoot
 - `assertKnownSubjects`: rejects an unknown subject; rejects a collar with no folder; passes the real set
 - alt-text generation for each of the four subject kinds, dated and undated
+
+**Unit (vitest) — `test/photos-index.test.ts`:**
+
+- `photosBySubject` with the real collar list returns 12 subjects totalling 137 photos — this is the
+  only check that the glob pattern actually resolves. A mis-resolved pattern yields zero matches and
+  would pass the build and both negative tests silently.
+- `photosBySubject(['Blue'])` throws naming the collars with no folder — proves validation runs on
+  every call, not just the first.
+
+This module needs no image-pipeline mocking: `src` is never dereferenced before validation throws,
+and the counts assert on keys, not on `ImageMetadata`.
 
 **E2E (playwright) — extends `test/e2e/`:**
 

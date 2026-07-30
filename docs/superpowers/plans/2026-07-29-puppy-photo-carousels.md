@@ -685,19 +685,20 @@ const files = import.meta.glob<{ default: ImageMetadata }>(
   { eager: true },
 );
 
-let cache: Record<string, Photo[]> | null = null;
-
 /**
  * Every photo grouped by subject, each list newest shoot first.
  *
  * `collarNames` comes from `litter.md` and is what the tree is validated
  * against — an unknown folder or a collar with no folder throws here, failing
- * the build rather than shipping an empty card. Memoized: the collar list is
- * content and does not change within a build.
+ * the build rather than shipping an empty card.
+ *
+ * Deliberately not memoized. Grouping 137 items costs microseconds, and a
+ * module-level cache would have to be keyed on `collarNames` to stay correct:
+ * `astro dev` keeps this module alive across requests, so an unkeyed cache
+ * would skip validation on every request after the first and silently render
+ * an empty card for a collar renamed mid-session.
  */
 export function photosBySubject(collarNames: string[]): Record<string, Photo[]> {
-  if (cache) return cache;
-
   const refs = Object.entries(files).map(([path, mod]) => ({
     ...parsePhotoPath(path),
     src: mod.default,
@@ -707,14 +708,12 @@ export function photosBySubject(collarNames: string[]): Record<string, Photo[]> 
 
   const displayName = new Map(collarNames.map((n) => [n.toLowerCase(), n]));
 
-  cache = Object.fromEntries(
+  return Object.fromEntries(
     Object.entries(groupBySubject(refs)).map(([subject, list]) => [
       subject,
       list.map((ref) => ({ ...ref, alt: photoAlt(ref, displayName.get(subject)) })),
     ]),
   );
-
-  return cache;
 }
 ```
 
