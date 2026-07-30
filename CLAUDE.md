@@ -53,6 +53,11 @@ One-click unsubscribe uses signed tokens (`src/lib/newsletter/unsubscribe-token.
 - **JSON envelope:** API responses are always `{ ok: boolean, error?, message? }` with appropriate status codes (400 validation, 401 unauthorized, 502 upstream).
 - **Immutability:** never mutate inputs; return new objects (global preference).
 - **Secrets** are all server-side env vars (`import.meta.env.*`), enumerated in `.env.example`. There are no public/`PUBLIC_` Supabase keys by design.
+- **Photos:** every photo lives at `src/assets/photos/<shoot>/<subject>/<subject>-NN.jpg`, where
+  `<shoot>` is an ISO date (or `pre-litter`) and `<subject>` is a lowercase collar name, `group`,
+  `coco`, or `first-days`. Cap the long edge at 2048px. Adding a shoot means adding a dated folder —
+  `src/lib/photos/` picks it up, orders it newest-first, and fails the build on an unknown subject
+  folder or a collar with no photos.
 
 ## Testing
 
