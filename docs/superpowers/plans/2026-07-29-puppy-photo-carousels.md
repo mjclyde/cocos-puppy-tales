@@ -744,20 +744,27 @@ Expected: FAIL with `src/assets/photos is misconfigured — unknown photo subjec
 
 - [ ] **Step 4: Prove the missing-folder half fails too**
 
+A collar counts as "present" if it has a folder under **any** shoot, so all three of Green's
+folders have to go for this to trip:
+
 ```bash
 rm -rf src/assets/photos/2026-07-23/teal
-mv src/assets/photos/2026-07-07/green /tmp/green-shoot
+mkdir -p /tmp/green-shoots
+mv src/assets/photos/2026-07-07/green /tmp/green-shoots/2026-07-07-green
+mv src/assets/photos/2026-07-23/green /tmp/green-shoots/2026-07-23-green
+mv src/assets/photos/2026-07-24/green /tmp/green-shoots/2026-07-24-green
 ```
 
 Run: `npm run build`
 Expected: FAIL with `collar(s) with no photo folder: green`.
 
-Note this only trips because `2026-07-07/green` was the folder moved; `green` still exists under other shoots — so if the build *passes* here, move all three `green` folders instead and re-run.
-
 - [ ] **Step 5: Restore and confirm green**
 
 ```bash
-mv /tmp/green-shoot src/assets/photos/2026-07-07/green
+mv /tmp/green-shoots/2026-07-07-green src/assets/photos/2026-07-07/green
+mv /tmp/green-shoots/2026-07-23-green src/assets/photos/2026-07-23/green
+mv /tmp/green-shoots/2026-07-24-green src/assets/photos/2026-07-24/green
+rmdir /tmp/green-shoots
 ```
 
 Then revert the two temporary lines in `src/pages/gallery.astro`:
