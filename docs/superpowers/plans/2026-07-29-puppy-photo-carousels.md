@@ -871,7 +871,9 @@ const many = photos.length > 1;
 
 <style>
   .carousel { position: relative; }
-  .frame { position: relative; aspect-ratio: 1 / 1; overflow: hidden; background: #e8e0d2; }
+  /* `touch-action: pan-y` keeps vertical scrolling but stops the scroller from
+     claiming a horizontal drag — without it the swipe often never fires on touch. */
+  .frame { position: relative; aspect-ratio: 1 / 1; overflow: hidden; background: #e8e0d2; touch-action: pan-y; }
   .slide { height: 100%; }
   /* `.pswp-item` is `display: contents`, so the image is the frame's layout child. */
   .slide-img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -964,20 +966,36 @@ const many = photos.length > 1;
       if (event.key === 'ArrowRight') { event.preventDefault(); show(index + 1); }
     });
 
+    // A swipe must not also open the lightbox, because `click` fires after
+    // `pointerup`. This is a permanent listener guarded by a flag rather than a
+    // one-shot listener armed per swipe: a TOUCH swipe past the tap slop fires no
+    // click at all, so a one-shot listener would stay armed and swallow the
+    // user's next tap — killing both PhotoSwipe and the arrows on the first try.
+    let swiped = false;
+    carousel.addEventListener(
+      'click',
+      (click) => {
+        if (!swiped) return;
+        swiped = false;
+        click.preventDefault();
+        click.stopPropagation();
+      },
+      { capture: true },
+    );
+
     let startX: number | null = null;
-    carousel.addEventListener('pointerdown', (event) => { startX = event.clientX; });
+    carousel.addEventListener('pointerdown', (event) => {
+      startX = event.clientX;
+      swiped = false; // a swipe that never produced a click must not leak into this one
+    });
+    carousel.addEventListener('pointercancel', () => { startX = null; });
     carousel.addEventListener('pointerup', (event) => {
       if (startX === null) return;
       const dx = event.clientX - startX;
       startX = null;
       if (Math.abs(dx) <= 30) return;
       show(dx < 0 ? index + 1 : index - 1);
-      // A swipe must not also open the lightbox: `click` fires after `pointerup`.
-      carousel.addEventListener(
-        'click',
-        (click) => { click.preventDefault(); click.stopPropagation(); },
-        { capture: true, once: true },
-      );
+      swiped = true;
     });
 
     carousel.dataset.ready = '';
