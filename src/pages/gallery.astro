@@ -42,7 +42,7 @@ const total = sections.reduce((n, section) => n + section.photos.length, 0);
         <>
           {/* Hidden until the script wires it up: without JS every section shows,
               which is still a complete gallery. */}
-          <div class="chips" data-chips hidden>
+          <div class="chips" data-chips hidden role="group" aria-label="Filter photos by puppy">
             <button class="chip" type="button" data-chip="all" aria-pressed="true">All</button>
             {collars.map((collar) => (
               <button class="chip" type="button" data-chip={collar.name.toLowerCase()} aria-pressed="false">
@@ -50,6 +50,11 @@ const total = sections.reduce((n, section) => n + section.photos.length, 0);
               </button>
             ))}
           </div>
+
+          {/* Filtering hides whole sections, which is silent to a screen reader —
+              this announces what the page now shows. Left empty on load so it
+              only speaks in response to a chip press. */}
+          <p class="visually-hidden" aria-live="polite" data-filter-status></p>
 
           {sections.map((section) => (
             <section class="gsection" data-section={section.id}>
@@ -100,9 +105,12 @@ const total = sections.reduce((n, section) => n + section.photos.length, 0);
   if (chips) {
     const buttons = [...chips.querySelectorAll<HTMLButtonElement>('[data-chip]')];
     const sections = [...document.querySelectorAll<HTMLElement>('[data-section]')];
+    const status = document.querySelector<HTMLElement>('[data-filter-status]');
     const known = new Set(buttons.map((b) => b.dataset.chip));
 
-    const apply = (id: string) => {
+    // `announce` is false on the initial hash-driven call: a live region populated
+    // during page load can be read out unprompted, which is noise, not information.
+    const apply = (id: string, announce: boolean) => {
       // An unknown hash falls back to All rather than an empty grid.
       const target = known.has(id) ? id : 'all';
       const solo = target !== 'all';
@@ -115,11 +123,21 @@ const total = sections.reduce((n, section) => n + section.photos.length, 0);
       });
 
       history.replaceState(null, '', solo ? `#${target}` : location.pathname);
+
+      if (announce && status) {
+        const shown = sections
+          .filter((section) => !section.hidden)
+          .reduce((n, section) => n + section.querySelectorAll('a.pswp-item').length, 0);
+        const label = buttons.find((b) => b.dataset.chip === target)?.textContent?.trim();
+        status.textContent = solo
+          ? `Showing ${label} collar, ${shown} photos`
+          : `Showing all photos, ${shown} in total`;
+      }
     };
 
-    buttons.forEach((b) => b.addEventListener('click', () => apply(b.dataset.chip ?? 'all')));
+    buttons.forEach((b) => b.addEventListener('click', () => apply(b.dataset.chip ?? 'all', true)));
 
     chips.hidden = false;
-    apply(location.hash.slice(1) || 'all');
+    apply(location.hash.slice(1) || 'all', false);
   }
 </script>
