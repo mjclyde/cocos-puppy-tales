@@ -2,24 +2,124 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import GalleryGrid from '../components/GalleryGrid.astro';
 import { getEntry } from 'astro:content';
-import type { ImageMetadata } from 'astro';
+import { photosBySubject, NON_PUPPY_SUBJECTS, SECTION_TITLES } from '../lib/photos';
 
 const site = await getEntry('site', 'config');
 const showGallery = site!.data.flags.showGallery;
 
-const files = import.meta.glob<{ default: ImageMetadata }>('../assets/gallery/*.{jpg,jpeg,png,webp}', { eager: true });
-const images = Object.entries(files).map(([path, mod]) => ({
-  src: mod.default,
-  alt: 'Coco ' + path.split('/').pop()!.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' '),
-}));
+// Collars drive both the chip row and the photo-tree validation. Read them
+// regardless of `published` — the photo tree does not change when the
+// announcement is toggled off.
+const litterEntry = await getEntry('litter', 'litter');
+const collars = litterEntry?.data.collars ?? [];
+const photos = photosBySubject(collars.map((c) => c.name));
+
+// Group / Coco / First days first, then the puppies in litter order.
+const sections = [
+  ...NON_PUPPY_SUBJECTS.map((subject) => ({
+    id: subject,
+    title: SECTION_TITLES[subject],
+    photos: photos[subject] ?? [],
+  })),
+  ...collars.map((collar) => ({
+    id: collar.name.toLowerCase(),
+    title: `${collar.name} collar`,
+    photos: photos[collar.name.toLowerCase()] ?? [],
+  })),
+].filter((section) => section.photos.length > 0);
+
+const total = sections.reduce((n, section) => n + section.photos.length, 0);
 ---
-<BaseLayout title="Gallery — Coco's Puppy Tales" description="Photos of Coco.">
+<BaseLayout title="Gallery — Coco's Puppy Tales" description="Photos of Coco and her nine puppies.">
   <section class="section">
     <div class="container">
       <h1>Gallery</h1>
+
       {!showGallery && <p>The gallery is coming soon. 🐾</p>}
-      {showGallery && images.length === 0 && <p>Photos coming soon. 🐾</p>}
-      {showGallery && images.length > 0 && <GalleryGrid images={images} />}
+      {showGallery && total === 0 && <p>Photos coming soon. 🐾</p>}
+
+      {showGallery && total > 0 && (
+        <>
+          {/* Hidden until the script wires it up: without JS every section shows,
+              which is still a complete gallery. */}
+          <div class="chips" data-chips hidden>
+            <button class="chip" type="button" data-chip="all" aria-pressed="true">All</button>
+            {collars.map((collar) => (
+              <button class="chip" type="button" data-chip={collar.name.toLowerCase()} aria-pressed="false">
+                <span class="sw" style={`--sw: ${collar.hex}`} aria-hidden="true"></span>{collar.name}
+              </button>
+            ))}
+          </div>
+
+          {sections.map((section) => (
+            <section class="gsection" data-section={section.id}>
+              <h2 class="gtitle">{section.title} <span class="gcount">{section.photos.length}</span></h2>
+              <GalleryGrid images={section.photos} />
+            </section>
+          ))}
+        </>
+      )}
     </div>
   </section>
 </BaseLayout>
+
+<style>
+  .chips { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0 0 1.5rem; }
+  .chips[hidden] { display: none; }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: #fff;
+    border: 1px solid rgba(43, 41, 38, 0.14);
+    border-radius: var(--radius-pill);
+    padding: 0.35rem 0.85rem;
+    font: inherit;
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--c-charcoal);
+    cursor: pointer;
+    box-shadow: 0 1px 4px rgba(43, 41, 38, 0.06);
+  }
+  .chip:hover { border-color: rgba(43, 41, 38, 0.3); }
+  .chip:focus-visible { outline: 3px solid var(--c-navy); outline-offset: 2px; }
+  .chip[aria-pressed='true'] { background: var(--c-navy); color: #fff; border-color: var(--c-navy); }
+  .sw { width: 0.75rem; height: 0.75rem; border-radius: var(--radius-pill); background: var(--sw); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12); }
+
+  .gsection { margin-bottom: 2rem; }
+  .gsection[hidden] { display: none; }
+  .gtitle { font-size: 1.1rem; margin: 0 0 0.65rem; }
+  .gcount { font-size: 0.8rem; font-weight: 600; color: var(--text); opacity: 0.55; margin-left: 0.3rem; }
+  /* One puppy selected: the chip already says whose photos these are. */
+  .gsection.is-solo .gtitle { display: none; }
+</style>
+
+<script>
+  const chips = document.querySelector<HTMLElement>('[data-chips]');
+
+  if (chips) {
+    const buttons = [...chips.querySelectorAll<HTMLButtonElement>('[data-chip]')];
+    const sections = [...document.querySelectorAll<HTMLElement>('[data-section]')];
+    const known = new Set(buttons.map((b) => b.dataset.chip));
+
+    const apply = (id: string) => {
+      // An unknown hash falls back to All rather than an empty grid.
+      const target = known.has(id) ? id : 'all';
+      const solo = target !== 'all';
+
+      buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.chip === target)));
+      sections.forEach((section) => {
+        const match = !solo || section.dataset.section === target;
+        section.hidden = !match;
+        section.classList.toggle('is-solo', solo);
+      });
+
+      history.replaceState(null, '', solo ? `#${target}` : location.pathname);
+    };
+
+    buttons.forEach((b) => b.addEventListener('click', () => apply(b.dataset.chip ?? 'all')));
+
+    chips.hidden = false;
+    apply(location.hash.slice(1) || 'all');
+  }
+</script>
