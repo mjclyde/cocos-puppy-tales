@@ -96,8 +96,15 @@ Three normalizations happen during the move:
    matters most for `2026-07-24/pink/`, whose six files are UUID-named and sort randomly today.
 3. **Long edge caps at 2048px.** The 07-23 shoot is 41 MB for 18 files at 4–5k px, and
    `litter/collars/` is 5712px. Uncapped, the build pushes ~411 image transforms through 20-megapixel
-   sources. Capping takes ~105 MB of new photos to roughly 25 MB with no visible difference — the
-   largest variant the site ever serves is 1600px.
+   sources. There is no visible cost to capping — the largest variant the site ever serves is 1600px
+   wide.
+
+   **Measured result: 209 MB of sources become 88 MB, not the ~25 MB first estimated.** That estimate
+   assumed most sources were oversized; in fact only the 07-23 shoot and `litter/collars/` exceeded
+   2048px, so for most files this is a re-encode rather than a downscale. Pushing further is not
+   worth it: `sips` quality is nearly flat between 82 and 75 (741 KB → 732 KB on a sample), and
+   reaching ~59 MB would mean quality 60, which visibly costs fur detail. 88 MB is what this photo
+   set costs. Served bytes are unaffected either way — visitors get Astro's webp variants.
 
 ### Duplicates
 

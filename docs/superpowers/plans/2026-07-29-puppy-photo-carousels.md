@@ -607,7 +607,11 @@ find src/assets/photos -type f -exec sips -g pixelWidth -g pixelHeight {} \; \
   | sort -rn | head -1
 ```
 
-Expected: `137`; roughly `25M` (down from ~105 MB of sources); max long edge `2048`.
+Expected: `137`; `88M` (down from ~209 MB across all five source locations); max long edge `2048`.
+
+Most sources were already at 2048px, so for them this is a re-encode, not a downscale — which is why
+the total lands at 88 MB. Do not chase a smaller number by lowering quality; `sips` output is nearly
+flat from 82 down to 75, and 60 costs visible fur detail.
 
 - [ ] **Step 5: Spot-check that the downscaled photos still look right**
 
@@ -1458,7 +1462,8 @@ find src/assets/photos -type f | wc -l
 du -sh src/assets
 ```
 
-Expected: `coco-hero.jpg  journey  litter  photos`; `137`; roughly `30M` total (down from ~209 MB).
+Expected: `coco-hero.jpg  journey  litter  photos`; `137`; roughly `92M` total (down from ~209 MB) —
+88 MB of that is `photos/`, the rest is `hero.jpg`, `coco-hero.jpg`, and `journey/`.
 
 - [ ] **Step 5: Full verification**
 
