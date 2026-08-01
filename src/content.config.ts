@@ -18,6 +18,7 @@ const journey = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/journey' }),
   schema: ({ image }) => z.object({
     week: z.number(),
+    phase: z.enum(['pregnancy', 'puppies']).default('pregnancy'),
     date: z.coerce.date(),
     title: z.string(),
     bellyPhoto: image().optional(),

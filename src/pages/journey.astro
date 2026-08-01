@@ -2,28 +2,58 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import UpdateCard from '../components/UpdateCard.astro';
 import { getCollection, render } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import { entriesForPhase } from '../lib/journey';
+import type { JourneyPhase } from '../lib/journey';
 
-const updates = (await getCollection('journey', ({ data }) => data.published))
-  .sort((a, b) => b.data.week - a.data.week);
+const published = await getCollection('journey', ({ data }) => data.published);
 
-const rendered = await Promise.all(updates.map(async (u) => ({
-  data: u.data,
-  Content: (await render(u)).Content,
-})));
+const renderAll = (entries: CollectionEntry<'journey'>[]) => Promise.all(
+  entries.map(async (entry) => ({
+    data: entry.data,
+    Content: (await render(entry)).Content,
+  })),
+);
+
+// Puppies first — the newest chapter leads.
+const PHASES: { phase: JourneyPhase; heading: string }[] = [
+  { phase: 'puppies', heading: 'The puppies' },
+  { phase: 'pregnancy', heading: "Coco's pregnancy" },
+];
+
+const groups = await Promise.all(
+  PHASES.map(async ({ heading, phase }) => ({
+    heading,
+    entries: await renderAll(entriesForPhase(published, phase)),
+  })),
+);
+
+const total = groups.reduce((n, group) => n + group.entries.length, 0);
 ---
-<BaseLayout title="The Journey — Coco's Puppy Tales" description="Weekly pregnancy updates following Coco's journey.">
+<BaseLayout title="The Journey — Coco's Puppy Tales" description="Weekly updates following Coco's pregnancy and her puppies' first weeks.">
   <section class="section">
     <div class="container">
       <h1>The Journey</h1>
-      <p>Weekly updates from Coco's pregnancy — newest first.</p>
-      {rendered.length === 0 && <p>Updates are coming soon. 🐾</p>}
+      <p>Weekly updates — from Coco's pregnancy to the puppies' first weeks. Newest first.</p>
+      {total === 0 && <p>Updates are coming soon. 🐾</p>}
       <div class="pswp-gallery">
-        {rendered.map(({ data, Content }) => (
-          <UpdateCard week={data.week} title={data.title} date={data.date} bellySizeComparison={data.bellySizeComparison} bellyPhoto={data.bellyPhoto} puppyGrowth={data.puppyGrowth}>
-            <Content />
-          </UpdateCard>
+        {groups.filter((group) => group.entries.length > 0).map((group) => (
+          <section class="phase">
+            <h2>{group.heading}</h2>
+            {group.entries.map(({ data, Content }) => (
+              <UpdateCard week={data.week} phase={data.phase} title={data.title} date={data.date} bellySizeComparison={data.bellySizeComparison} bellyPhoto={data.bellyPhoto} puppyGrowth={data.puppyGrowth}>
+                <Content />
+              </UpdateCard>
+            ))}
+          </section>
         ))}
       </div>
     </div>
   </section>
 </BaseLayout>
+
+<style>
+  .phase { margin-bottom: 2rem; }
+  .phase:last-child { margin-bottom: 0; }
+  .phase h2 { margin-bottom: 1rem; }
+</style>
