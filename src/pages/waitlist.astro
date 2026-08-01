@@ -1,12 +1,33 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import WaitlistForm from '../components/WaitlistForm.astro';
+import PuppyDetails from '../components/PuppyDetails.astro';
+import { getEntry } from 'astro:content';
+
+const litter = await getEntry('litter', 'litter');
+const site = await getEntry('site', 'config');
+const showPricing = site!.data.flags.showPricing;
 ---
-<BaseLayout title="Waitlist — Coco's Puppy Tales" description="Join the waitlist for one of Coco's puppies.">
+<BaseLayout title="Bring one home — Coco's Puppy Tales" description="Pricing, go-home date, and the waitlist for one of Coco's puppies.">
   <section class="section">
     <div class="container">
-      <h1>Join the waitlist</h1>
-      <p>Hoping to welcome one of Coco's puppies? Tell us about your home. We read every submission and reach out personally — this isn't first-come, first-served.</p>
+      <h1>Bring one home</h1>
+      <p>Hoping to welcome one of Coco's puppies? Here's everything you'd be signing up for — then tell us about your home. We read every submission and reach out personally; this isn't first-come, first-served.</p>
+
+      {litter && (
+        <PuppyDetails
+          goHomeDate={litter.data.goHomeDate}
+          price={litter.data.price}
+          deposit={litter.data.deposit}
+          depositMethods={litter.data.depositMethods}
+          healthGuarantee={litter.data.healthGuarantee}
+          goesHomeWith={litter.data.goesHomeWith}
+          raisingHighlights={litter.data.raisingHighlights}
+          matchingNote={litter.data.matchingNote}
+          showPricing={showPricing}
+        />
+      )}
+
       <WaitlistForm />
     </div>
   </section>

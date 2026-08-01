@@ -1,0 +1,82 @@
+---
+import { formatUsd, formatLongDate } from '../lib/format';
+
+interface Props {
+  goHomeDate: Date;
+  price: number;
+  deposit: number;
+  depositMethods: string[];
+  healthGuarantee: string;
+  goesHomeWith: string[];
+  raisingHighlights: string[];
+  matchingNote: string;
+  showPricing: boolean;
+}
+
+const {
+  goHomeDate, price, deposit, depositMethods,
+  healthGuarantee, goesHomeWith, raisingHighlights, matchingNote, showPricing,
+} = Astro.props;
+
+// Oxford-comma list: "cash, check, Venmo, or Apple Pay".
+const methods = depositMethods.length <= 1
+  ? depositMethods.join('')
+  : `${depositMethods.slice(0, -1).join(', ')}, or ${depositMethods[depositMethods.length - 1]}`;
+---
+<section class="details" aria-labelledby="details-heading">
+  <h2 id="details-heading">Before you apply</h2>
+
+  <dl class="facts">
+    <div class="fact">
+      <dt>Ready to come home</dt>
+      <dd>{formatLongDate(goHomeDate)}</dd>
+    </div>
+    {showPricing && (
+      <>
+        <div class="fact">
+          <dt>Price</dt>
+          <dd>{formatUsd(price)}</dd>
+        </div>
+        <div class="fact">
+          <dt>Deposit to hold a spot</dt>
+          <dd>{formatUsd(deposit)}</dd>
+        </div>
+      </>
+    )}
+  </dl>
+
+  {showPricing && (
+    <p class="deposit-note">
+      We like to talk first — once we've found the right match, we'll arrange the
+      {' '}{formatUsd(deposit)} deposit together. We accept {methods}. Nothing is collected
+      through this website.
+    </p>
+  )}
+
+  <h3>Every puppy goes home with</h3>
+  <ul>{goesHomeWith.map((item) => <li>{item}</li>)}</ul>
+
+  <h3>How we raise them</h3>
+  <ul>{raisingHighlights.map((item) => <li>{item}</li>)}</ul>
+  <p class="more"><a href="/journey">Follow the whole story week by week →</a></p>
+
+  <h3>Health guarantee</h3>
+  <p>{healthGuarantee}</p>
+
+  <h3>Finding the right fit</h3>
+  <p>{matchingNote}</p>
+</section>
+
+<style>
+  .details { background: var(--c-cream); border-radius: var(--radius); margin: 1.5rem 0 2rem; padding: 1.5rem; }
+  .details h2 { margin-top: 0; }
+  .details h3 { font-size: 1.05rem; margin: 1.25rem 0 0.4rem; }
+  .facts { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); margin: 0 0 1rem; }
+  .fact { background: #fff; border-radius: var(--radius); padding: 0.85rem 1rem; }
+  .fact dt { color: var(--eyebrow); font-size: 0.75rem; font-weight: 900; letter-spacing: 0.06em; text-transform: uppercase; }
+  .fact dd { font-size: 1.25rem; font-weight: 900; margin: 0.2rem 0 0; color: var(--heading); }
+  .deposit-note { font-size: 0.95rem; }
+  .details ul { margin: 0; padding-left: 1.2rem; }
+  .details li { margin-bottom: 0.3rem; }
+  .more { margin: 0.6rem 0 0; }
+</style>
