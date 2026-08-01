@@ -46,6 +46,14 @@ const litter = defineCollection({
     boys: z.number(),
     girls: z.number(),
     weightRange: z.string(),
+    goHomeDate: z.coerce.date(),
+    price: z.number().positive(),
+    deposit: z.number().positive(),
+    depositMethods: z.array(z.string()).min(1),
+    healthGuarantee: z.string(),
+    goesHomeWith: z.array(z.string()).min(1),
+    raisingHighlights: z.array(z.string()).min(1),
+    matchingNote: z.string(),
     headline: z.string(),
     heroImage: image(),
     collars: z.array(z.object({
@@ -70,7 +78,8 @@ const site = defineCollection({
     flags: z.object({
       showGallery: z.boolean().default(true),
       showSubscribe: z.boolean().default(true),
-    }).default({ showGallery: true, showSubscribe: true }),
+      showPricing: z.boolean().default(true),
+    }).default({ showGallery: true, showSubscribe: true, showPricing: true }),
   }),
 });
 

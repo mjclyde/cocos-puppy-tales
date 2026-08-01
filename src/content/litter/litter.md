@@ -4,6 +4,24 @@ count: 9
 boys: 5
 girls: 4
 weightRange: "14–20 oz"
+goHomeDate: 2026-08-20T06:00:00.000Z
+price: 3000
+deposit: 250
+depositMethods: ["Cash", "Check", "Venmo", "Apple Pay"]
+healthGuarantee: "A written health guarantee is included in your puppy contract."
+goesHomeWith:
+  - Vet exam and age-appropriate first shots
+  - Dewormed on schedule
+  - AKC registration papers
+  - Leash, collar, and a blanket that smells like mama
+  - A surprise keepsake
+  - Quality kibble for the first week at home
+raisingHighlights:
+  - Raised inside our home from birth
+  - ENS (early neurological stimulation) and ESI (early scent introduction)
+  - Daily socialization and enrichment
+  - Potty training started
+matchingNote: "We'd love to help match you with the puppy whose personality and energy level best fit your family and lifestyle."
 headline: "Meet Coco's puppies"
 heroImage: ../../assets/litter/hero.jpg
 collars:

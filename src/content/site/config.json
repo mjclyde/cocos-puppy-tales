@@ -6,6 +6,6 @@
     "contactEmail": "cocos-puppy-tales@mjclyde.com",
     "socialLinks": [],
     "cardCoverShoot": "2026-07-23",
-    "flags": { "showGallery": true, "showSubscribe": true }
+    "flags": { "showGallery": true, "showSubscribe": true, "showPricing": true }
   }
 ]
