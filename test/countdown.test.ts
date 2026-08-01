@@ -17,4 +17,19 @@ describe('getCountdown', () => {
       days: 0, hours: 0, minutes: 0, seconds: 0, isPast: true,
     });
   });
+
+  it('treats the exact target instant as past', () => {
+    const at = new Date('2026-08-20T06:00:00Z');
+    expect(getCountdown(at, at)).toEqual({
+      days: 0, hours: 0, minutes: 0, seconds: 0, isPast: true,
+    });
+  });
+
+  it('is not past one second before the target', () => {
+    const target = new Date('2026-08-20T06:00:00Z');
+    const now = new Date('2026-08-20T05:59:59Z');
+    expect(getCountdown(target, now)).toEqual({
+      days: 0, hours: 0, minutes: 0, seconds: 1, isPast: false,
+    });
+  });
 });

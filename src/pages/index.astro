@@ -11,6 +11,7 @@ import SubscribeForm from '../components/SubscribeForm.astro';
 import { getEntry, render } from 'astro:content';
 import { photosBySubject, withCoverFirst } from '../lib/photos';
 import { availabilityLine } from '../lib/availability';
+import { formatLongDate } from '../lib/format';
 
 const coco = await getEntry('coco', 'coco');
 const site = await getEntry('site', 'config');
@@ -50,6 +51,14 @@ const availability = litter ? availabilityLine(litter.collars) : null;
             <h2>They arrived a few days early!</h2>
             {Content && <Content />}
           </div>
+        </div>
+      </section>
+
+      <section class="section gohome-section">
+        <div class="container">
+          <h2>Ready to go home</h2>
+          <p>The puppies leave for their new families on <strong>{formatLongDate(litter.goHomeDate)}</strong>.</p>
+          <CountdownTimer targetDate={litter.goHomeDate} pastLabel="The puppies are home! 🐾" />
         </div>
       </section>
 
@@ -97,7 +106,7 @@ const availability = litter ? availabilityLine(litter.collars) : null;
         <div class="container">
           <h2>Expected arrival</h2>
           <p>We're expecting {litterEstimate}! Here's the countdown:</p>
-          <CountdownTimer dueDate={dueDate} />
+          <CountdownTimer targetDate={dueDate} />
         </div>
       </section>
     </>
@@ -147,6 +156,7 @@ const availability = litter ? availabilityLine(litter.collars) : null;
   .cta h2 { color: #fff; }
   .cta p { margin: 0.25rem 0 1.25rem; }
   .subscribe-section { background: #fff; }
+  .gohome-section { background: #fff; }
   @media (max-width: 700px) {
     .hero-grid {
       grid-template-columns: 1fr;

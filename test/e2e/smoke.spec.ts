@@ -3,9 +3,11 @@ import { test, expect } from '@playwright/test';
 test('home page shows the litter, birth story, cast, and nav works', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { name: "Meet Coco's puppies" })).toBeVisible();
-  // Birth announcement replaced the pre-birth countdown.
+  // Birth announcement replaced the pre-birth hero.
   await expect(page.locator('#litter-age .num')).toBeVisible();
-  await expect(page.locator('#countdown')).toHaveCount(0);
+  // The pre-birth countdown is gone, but a go-home countdown now runs.
+  await expect(page.locator('#countdown')).toHaveCount(1);
+  await expect(page.getByRole('heading', { name: 'Ready to go home' })).toBeVisible();
   // Stats band.
   await expect(page.getByText('9', { exact: true }).first()).toBeVisible();
   // Birth story now lives in the hero.
