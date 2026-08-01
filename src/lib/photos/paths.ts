@@ -128,7 +128,7 @@ export function shootLabel(shoot: string): string | null {
 
 /**
  * Generated alt text. Pass `collarDisplayName` for a puppy subject; omit it for
- * `group`/`coco`/`first-days`.
+ * `group`/`coco`/`sire`/`first-days`.
  */
 export function photoAlt(ref: PhotoRef, collarDisplayName?: string): string {
   const label = shootLabel(ref.shoot);
