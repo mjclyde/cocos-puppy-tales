@@ -14,8 +14,12 @@ const DATED_SHOOT = /^\d{4}-\d{2}-\d{2}$/;
 /**
  * The sire's display name.
  *
- * Also set in `src/content/coco/sire.md` frontmatter — these are the only two
- * places his name appears in the repo. Keep them in sync.
+ * His spelling is unverified, and it appears in five places that must be kept in
+ * sync — correcting it here alone reds four assertions:
+ *   - `src/content/coco/sire.md` — the `name` field and the body prose
+ *   - here
+ *   - `test/photos-paths.test.ts` — `photoAlt` expectations
+ *   - `test/e2e/smoke.spec.ts` — the parents-page heading assertions
  */
 const SIRE_NAME = 'Rocko';
 
