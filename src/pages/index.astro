@@ -23,7 +23,7 @@ const litterEntry = await getEntry('litter', 'litter');
 // can never redirect to itself, so both states must render here.
 const litter = litterEntry?.data.published ? litterEntry.data : null;
 const { Content } = litter && litterEntry ? await render(litterEntry) : { Content: null };
-const bornStr = litter ? litter.bornDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
+const bornStr = litter ? formatLongDate(litter.bornDate) : '';
 const pageDescription = litter
   ? `Coco's ${litter.count} puppies have arrived! Meet the whole litter, born ${bornStr}.`
   : undefined;

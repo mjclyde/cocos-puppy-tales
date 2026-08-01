@@ -16,7 +16,9 @@ const { name, hex, sex, status, note, photos } = Astro.props;
 const isReserved = status === 'reserved';
 ---
 <article class:list={['pup', { 'is-reserved': isReserved }]} style={`--collar: ${hex}`}>
-  <PuppyCarousel name={name} photos={photos} />
+  <div class="pup-photo">
+    <PuppyCarousel name={name} photos={photos} />
+  </div>
   <div class="pup-body">
     <div class="nameplate">
       <svg class="swatch" viewBox="0 0 24 24" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
@@ -39,7 +41,10 @@ const isReserved = status === 'reserved';
   .sex-boy { background: var(--c-boy); }
   .sex-girl { background: var(--c-girl); }
   .pup-note { margin: 0.5rem 0 0; color: var(--text); font-size: 0.9rem; line-height: 1.4; }
-  .pup.is-reserved { opacity: 0.75; }
+  /* Dim only the photo, not the whole card — the name/note/sex-chip text needs
+     full contrast against the cream page background to clear WCAG AA; the
+     "Reserved" state is conveyed by the badge text below, not by opacity. */
+  .pup.is-reserved .pup-photo { opacity: 0.75; }
   .reserved {
     background: var(--c-cream);
     border: 1px solid rgba(43, 41, 38, 0.18);

@@ -2,8 +2,11 @@
  * Pure helpers for the `src/assets/photos/<shoot>/<subject>/<file>` tree.
  *
  * Deliberately free of Astro/Vite imports so the ordering and validation rules
- * can be unit-tested with plain strings.
+ * can be unit-tested with plain strings. `../format` is plain TypeScript with
+ * no Astro imports either, so importing it here is safe.
  */
+
+import { formatLongDate } from '../format';
 
 const PHOTOS_ROOT = '/assets/photos/';
 const DATED_SHOOT = /^\d{4}-\d{2}-\d{2}$/;
@@ -118,12 +121,7 @@ export function assertKnownSubjects(subjects: string[], collarNames: string[]): 
 /** `2026-07-23` → `July 23, 2026`. Undated shoots have no label. */
 export function shootLabel(shoot: string): string | null {
   if (!isDatedShoot(shoot)) return null;
-  return new Date(`${shoot}T00:00:00Z`).toLocaleDateString('en-US', {
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-    timeZone: 'UTC',
-  });
+  return formatLongDate(new Date(`${shoot}T00:00:00Z`));
 }
 
 /**

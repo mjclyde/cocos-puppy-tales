@@ -14,7 +14,7 @@ const litterEntry = await getEntry('litter', 'litter');
 const collars = litterEntry?.data.collars ?? [];
 const photos = photosBySubject(collars.map((c) => c.name));
 
-// Group / Coco / First days first, then the puppies in litter order.
+// Group / Coco / Dad / First days first, then the puppies in litter order.
 const sections = [
   ...NON_PUPPY_SUBJECTS.map((subject) => ({
     id: subject,

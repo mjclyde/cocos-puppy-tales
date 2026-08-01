@@ -127,10 +127,16 @@ test('the details block answers price and go-home date before the form', async (
 });
 
 test('no page leaks a payment handle or phone number', async ({ page }) => {
-  for (const path of ['/', '/waitlist', '/coco']) {
+  // Hardcoded rather than imported from src/content/site/config.json: this
+  // spec asserts on rendered page text only, and the site's own contact
+  // email is the one legitimate handle-shaped string the guard must let
+  // through — stripping it first, rather than carving an exception into the
+  // regex, keeps the pattern itself simple and still able to fail.
+  const CONTACT_EMAIL = 'cocos-puppy-tales@mjclyde.com';
+  for (const path of ['/', '/waitlist', '/coco', '/journey', '/breed', '/gallery']) {
     await page.goto(path);
-    const body = await page.locator('body').innerText();
-    expect(body).not.toMatch(/@[A-Za-z0-9_-]{3,}\b(?!\.)/); // Venmo-style handle
+    const body = (await page.locator('body').innerText()).replaceAll(CONTACT_EMAIL, '');
+    expect(body).not.toMatch(/@[A-Za-z0-9_.-]{3,}/); // Venmo-style handle
     expect(body).not.toMatch(/\b\d{3}[.\-\s]\d{3}[.\-\s]\d{4}\b/); // phone number
   }
 });

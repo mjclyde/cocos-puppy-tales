@@ -7,8 +7,11 @@ import { getEntry } from 'astro:content';
 const litter = await getEntry('litter', 'litter');
 const site = await getEntry('site', 'config');
 const showPricing = site!.data.flags.showPricing;
+const description = showPricing
+  ? "Pricing, go-home date, and the waitlist for one of Coco's puppies."
+  : "Go-home date and the waitlist for one of Coco's puppies.";
 ---
-<BaseLayout title="Bring one home — Coco's Puppy Tales" description="Pricing, go-home date, and the waitlist for one of Coco's puppies.">
+<BaseLayout title="Bring one home — Coco's Puppy Tales" description={description}>
   <section class="section">
     <div class="container">
       <h1>Bring one home</h1>
