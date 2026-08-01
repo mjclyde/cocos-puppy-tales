@@ -9,6 +9,8 @@ import {
   assertKnownSubjects,
   shootLabel,
   photoAlt,
+  NON_PUPPY_SUBJECTS,
+  SECTION_TITLES,
 } from '../src/lib/photos/paths';
 
 describe('parsePhotoPath', () => {
@@ -192,6 +194,15 @@ describe('assertKnownSubjects', () => {
   it('matches collars case-insensitively', () => {
     expect(() => assertKnownSubjects(allSubjects, ['BLUE', 'Black', 'Brown', 'Yellow', 'Orange', 'Pink', 'Purple', 'Red', 'Green'])).not.toThrow();
   });
+
+  it('accepts a sire folder', () => {
+    expect(() => assertKnownSubjects([...allSubjects, 'sire'], COLLARS)).not.toThrow();
+  });
+
+  it('does not require a sire folder to exist', () => {
+    // Only collars are mandatory; the sire section appears once photos are added.
+    expect(() => assertKnownSubjects(allSubjects, COLLARS)).not.toThrow();
+  });
 });
 
 describe('shootLabel', () => {
@@ -237,7 +248,29 @@ describe('photoAlt', () => {
     expect(photoAlt({ shoot: 'pre-litter', subject: 'coco', file: 'coco-01.jpg' })).toBe('Coco');
   });
 
+  it('names the sire and dates the shoot', () => {
+    expect(photoAlt({ shoot: '2026-07-24', subject: 'sire', file: 'sire-01.jpg' })).toBe(
+      'Rocko — July 24, 2026',
+    );
+  });
+
+  it('omits the date for an undated sire photo', () => {
+    expect(photoAlt({ shoot: 'pre-litter', subject: 'sire', file: 'sire-01.jpg' })).toBe('Rocko');
+  });
+
   it('throws for a subject it cannot describe', () => {
     expect(() => photoAlt({ shoot: '2026-07-24', subject: 'teal', file: 'teal-01.jpg' })).toThrow(/teal/);
+  });
+});
+
+describe('SECTION_TITLES', () => {
+  it('titles every non-puppy subject, so no gallery section renders unlabelled', () => {
+    for (const subject of NON_PUPPY_SUBJECTS) {
+      expect(SECTION_TITLES[subject]).toBeTruthy();
+    }
+  });
+
+  it('lists Coco before the sire, so Mom leads Dad in the gallery', () => {
+    expect(NON_PUPPY_SUBJECTS.indexOf('coco')).toBeLessThan(NON_PUPPY_SUBJECTS.indexOf('sire'));
   });
 });

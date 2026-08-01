@@ -8,6 +8,14 @@
 const PHOTOS_ROOT = '/assets/photos/';
 const DATED_SHOOT = /^\d{4}-\d{2}-\d{2}$/;
 
+/**
+ * The sire's display name.
+ *
+ * Also set in `src/content/coco/sire.md` frontmatter — these are the only two
+ * places his name appears in the repo. Keep them in sync.
+ */
+const SIRE_NAME = 'Rocko';
+
 export interface PhotoRef {
   shoot: string;
   subject: string;
@@ -15,12 +23,13 @@ export interface PhotoRef {
 }
 
 /** Subjects that are not a single puppy. Also the display order of their gallery sections. */
-export const NON_PUPPY_SUBJECTS = ['group', 'coco', 'first-days'] as const;
+export const NON_PUPPY_SUBJECTS = ['group', 'coco', 'sire', 'first-days'] as const;
 export type NonPuppySubject = (typeof NON_PUPPY_SUBJECTS)[number];
 
 export const SECTION_TITLES: Record<NonPuppySubject, string> = {
   group: 'Group photos',
   coco: 'Coco',
+  sire: 'Dad',
   'first-days': 'First days',
 };
 
@@ -134,6 +143,8 @@ export function photoAlt(ref: PhotoRef, collarDisplayName?: string): string {
       return "Coco's puppies in their first few days";
     case 'coco':
       return dated('Coco');
+    case 'sire':
+      return dated(SIRE_NAME);
     default:
       throw new Error(`Cannot build alt text for unknown subject: ${ref.subject}`);
   }
