@@ -2,41 +2,66 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { Image } from 'astro:assets';
 import ZoomableImage from '../components/ZoomableImage.astro';
-import { getEntry, render } from 'astro:content';
+import { getCollection, render } from 'astro:content';
 
-const coco = await getEntry('coco', 'coco');
-const { Content } = await render(coco!);
-const { name, breed, heroImage, personalityTraits, healthFacts, pedigree } = coco!.data;
+const ROLE_ORDER = { dam: 0, sire: 1 } as const;
+const ROLE_LABEL = { dam: 'Mom', sire: 'Dad' } as const;
+
+// Mom first. Spread before sorting — `.sort()` mutates in place.
+const parents = [...(await getCollection('coco'))].sort(
+  (a, b) => ROLE_ORDER[a.data.role] - ROLE_ORDER[b.data.role],
+);
+
+const rendered = await Promise.all(parents.map(async (parent) => ({
+  data: parent.data,
+  Content: (await render(parent)).Content,
+})));
+
+const names = rendered.map((p) => p.data.name).join(' and ');
 ---
-<BaseLayout title={`Meet ${name} — Coco's Puppy Tales`} description={`Meet ${name}, our ${breed}.`}>
+<BaseLayout title={`Meet ${names} — Coco's Puppy Tales`} description={`Meet ${names}, the parents of our Bernese Mountain Dog litter.`}>
   <section class="section">
-    <div class="container coco-grid pswp-gallery">
-      <ZoomableImage src={heroImage}>
-        <Image src={heroImage} alt={`${name} the ${breed}`} class="coco-img" widths={[400, 800]} sizes="(max-width: 700px) 100vw, 420px" format="webp" quality={80} />
-      </ZoomableImage>
-      <div>
-        <span class="chip">{breed}</span>
-        <h1>Meet {name}</h1>
-        <div class="traits">
-          {personalityTraits.map((t) => <span class="trait">{t}</span>)}
-        </div>
-        <div class="prose"><Content /></div>
-        {healthFacts.length > 0 && (
-          <>
-            <h3>Health & pedigree</h3>
-            <ul>{healthFacts.map((f) => <li>{f}</li>)}</ul>
-            {pedigree && <p>{pedigree}</p>}
-          </>
-        )}
-      </div>
+    <div class="container pswp-gallery">
+      <h1>Meet {names}</h1>
+      {rendered.map(({ data, Content }) => (
+        <article class="parent">
+          <ZoomableImage src={data.heroImage}>
+            <Image src={data.heroImage} alt={`${data.name} the ${data.breed}`} class="parent-img" widths={[400, 800]} sizes="(max-width: 700px) 100vw, 420px" format="webp" quality={80} />
+          </ZoomableImage>
+          <div>
+            <p class="eyebrow">{ROLE_LABEL[data.role]}</p>
+            <h2>{data.name}</h2>
+            <span class="chip">{data.breed}</span>
+            {data.personalityTraits.length > 0 && (
+              <div class="traits">
+                {data.personalityTraits.map((t) => <span class="trait">{t}</span>)}
+              </div>
+            )}
+            <div class="prose"><Content /></div>
+            {data.healthFacts.length > 0 && (
+              <>
+                <h3>Health &amp; pedigree</h3>
+                <ul>{data.healthFacts.map((f) => <li>{f}</li>)}</ul>
+                {data.pedigree && <p>{data.pedigree}</p>}
+              </>
+            )}
+          </div>
+        </article>
+      ))}
     </div>
   </section>
 </BaseLayout>
 
 <style>
-  .coco-grid { display: grid; grid-template-columns: 420px 1fr; gap: 2rem; align-items: start; }
-  .coco-img { border-radius: var(--radius); box-shadow: var(--shadow-lg); width: 100%; height: auto; }
+  .parent { display: grid; grid-template-columns: 420px 1fr; gap: 2rem; align-items: start; margin-bottom: 2.5rem; }
+  .parent:last-child { margin-bottom: 0; }
+  /* Coco's hero is 4:5; the sire's is square. Normalising in CSS keeps the two
+     portraits visually matched without re-cropping either file, and survives a
+     future photo swap. */
+  .parent-img { aspect-ratio: 4 / 5; object-fit: cover; border-radius: var(--radius); box-shadow: var(--shadow-lg); width: 100%; height: auto; }
+  .eyebrow { color: var(--eyebrow); font-size: 0.8rem; font-weight: 900; letter-spacing: 0.06em; margin: 0 0 0.2rem; text-transform: uppercase; }
+  .parent h2 { margin: 0 0 0.5rem; }
   .traits { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 0.75rem 0; }
   .trait { background: var(--c-sage); color: #fff; border-radius: var(--radius-pill); padding: 0.3rem 0.8rem; font-weight: 700; font-size: 0.85rem; }
-  @media (max-width: 700px) { .coco-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 700px) { .parent { grid-template-columns: 1fr; } }
 </style>

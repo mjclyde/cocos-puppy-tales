@@ -7,8 +7,11 @@ personalityTraits:
   - Playful
   - Goofy
 healthFacts:
-  - Health-tested per Bernese breed recommendations
-  - Up to date on vaccinations
+  - AKC registered
+  - Health tested
+  - OFA certified — hips, elbows, eyes, and heart; DM normal; vWD cleared
+  - CHIC certified (CHIC number available on request)
+pedigree: "Advanced pedigree available on request."
 ---
 
 Coco is, objectively, the best dog in the world. She greets every morning like it's a

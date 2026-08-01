@@ -5,9 +5,10 @@ const coco = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/coco' }),
   schema: ({ image }) => z.object({
     name: z.string(),
+    role: z.enum(['dam', 'sire']).default('dam'),
     breed: z.string(),
     heroImage: image(),
-    personalityTraits: z.array(z.string()),
+    personalityTraits: z.array(z.string()).default([]),
     healthFacts: z.array(z.string()).default([]),
     pedigree: z.string().optional(),
   }),
