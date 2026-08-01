@@ -334,10 +334,15 @@ and discard accumulated SEO.
   `assertKnownSubjects` accepts a `sire` folder and still rejects unknown folders, and `SECTION_TITLES`
   covers every `NON_PUPPY_SUBJECTS` member.
 - `countdown.test.ts` — extend for the past state now that `isPast` drives visible markup.
-- New `litter-availability.test.ts` — available-count derivation from `collars[]`: all available, some
-  reserved, all reserved, and the `status` default applying when the field is absent.
-- New `journey-phase.test.ts` — grouping and per-group descending sort, including the regression this
+- New `availability.test.ts` — available-count derivation from `collars[]`: all available, some
+  reserved, all reserved, singular wording, and immutability of the input.
+- New `journey.test.ts` — grouping and per-group descending sort, including the regression this
   fixes: a puppy week 1 must not sort below a pregnancy week 8.
+- New `format.test.ts` — currency formatting without cents, and long-date formatting that does not
+  drift a day across time zones.
+
+Test filenames mirror their lib module (`availability.ts` → `availability.test.ts`), matching the
+existing `countdown.ts` → `countdown.test.ts` convention.
 
 Availability counting and journey grouping are extracted into `src/lib/` as pure functions so they
 are testable without rendering Astro components, matching how `countdown.ts` and `age.ts` are
