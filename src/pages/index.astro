@@ -10,6 +10,7 @@ import ZoomableImage from '../components/ZoomableImage.astro';
 import SubscribeForm from '../components/SubscribeForm.astro';
 import { getEntry, render } from 'astro:content';
 import { photosBySubject, withCoverFirst } from '../lib/photos';
+import { availabilityLine } from '../lib/availability';
 
 const coco = await getEntry('coco', 'coco');
 const site = await getEntry('site', 'config');
@@ -30,6 +31,7 @@ const pageOgImage = litter ? '/og-litter.jpg' : undefined;
 // Validate and index against every collar in the content, published or not —
 // the photo tree does not change when the announcement is toggled off.
 const photos = photosBySubject((litterEntry?.data.collars ?? []).map((c) => c.name));
+const availability = litter ? availabilityLine(litter.collars) : null;
 ---
 <BaseLayout title="Coco's Puppy Tales" description={pageDescription} ogImage={pageOgImage}>
   {litter ? (
@@ -61,12 +63,14 @@ const photos = photosBySubject((litterEntry?.data.collars ?? []).map((c) => c.na
         <div class="container">
           <p class="eyebrow">Meet the cast</p>
           <h2>Nine collars, nine personalities</h2>
+          {availability && <p class="availability">{availability}</p>}
           <div class="cast">
             {litter.collars.map((c) => (
               <PuppyCard
                 name={c.name}
                 hex={c.hex}
                 sex={c.sex}
+                status={c.status}
                 note={c.note}
                 photos={withCoverFirst(photos[c.name.toLowerCase()] ?? [], cardCoverShoot)}
               />
@@ -137,6 +141,7 @@ const photos = photosBySubject((litterEntry?.data.collars ?? []).map((c) => c.na
   .hero-story h2 { font-size: clamp(1.3rem, 3vw, 1.7rem); margin: 0 0 0.5rem; }
   .hero-story :global(p) { font-size: 1.02rem; }
   .eyebrow { color: var(--eyebrow); font-size: 0.8rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 0.35rem; }
+  .availability { color: var(--c-brown); font-weight: 700; margin: 0 0 1rem; }
   .cast { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; }
   .cta { background: var(--c-sage-deep); color: #fff; border-radius: var(--radius); padding: 2rem; text-align: center; }
   .cta h2 { color: #fff; }

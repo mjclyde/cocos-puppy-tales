@@ -60,6 +60,7 @@ const litter = defineCollection({
       name: z.string(),
       hex: z.string(),
       sex: z.enum(['boy', 'girl']),
+      status: z.enum(['available', 'reserved']).default('available'),
       note: z.string().optional(),
     })),
     published: z.boolean().default(true),

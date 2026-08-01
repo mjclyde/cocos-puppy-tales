@@ -28,8 +28,8 @@ collars:
   - { name: "Blue",   hex: "#3b6fd6", sex: boy,  note: "First born — led the way." }
   - { name: "Black",  hex: "#2a2a2a", sex: boy,  note: "The dramatic one — growing fastest." }
   - { name: "Brown",  hex: "#8a5a2b", sex: boy,  note: "Aka \"Potato\" — loves to sleep." }
-  - { name: "Yellow", hex: "#e0b031", sex: boy,  note: "Has the most unique markings." }
-  - { name: "Orange", hex: "#e8863b", sex: boy,  note: "First to open his eyes." }
+  - { name: "Yellow", hex: "#e0b031", sex: boy,  status: reserved, note: "Has the most unique markings." }
+  - { name: "Orange", hex: "#e8863b", sex: boy,  status: reserved, note: "First to open his eyes." }
   - { name: "Pink",   hex: "#e58fb0", sex: girl, note: "Coco's little mini-me." }
   - { name: "Purple", hex: "#7b4fc9", sex: girl, note: "Last to arrive, worth the wait." }
   - { name: "Red",    hex: "#d24a45", sex: girl, note: "Sweet and small — nicknamed \"Ruby.\"" }
