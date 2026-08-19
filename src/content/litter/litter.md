@@ -22,7 +22,8 @@ raisingHighlights:
   - Daily socialization and enrichment
   - Potty training started
 matchingNote: "We'd love to help match you with the puppy whose personality and energy level best fit your family and lifestyle."
-headline: "Meet Coco's puppies"
+headline: "Meet Coco's nine puppies"
+tagline: "Ready to go home now — and they're going fast."
 heroImage: ../../assets/litter/hero.jpg
 collars:
   - {

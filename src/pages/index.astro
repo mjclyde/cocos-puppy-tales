@@ -1,78 +1,52 @@
 ---
-import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/Hero.astro';
 import CountdownTimer from '../components/CountdownTimer.astro';
-import LitterStats from '../components/LitterStats.astro';
 import LitterAge from '../components/LitterAge.astro';
 import PuppyCard from '../components/PuppyCard.astro';
-import ZoomableImage from '../components/ZoomableImage.astro';
+import TrustBadges from '../components/TrustBadges.astro';
 import SubscribeForm from '../components/SubscribeForm.astro';
-import { getEntry, render } from 'astro:content';
+import { getEntry } from 'astro:content';
 import { photosBySubject, withCoverFirst } from '../lib/photos';
-import { availabilityLine } from '../lib/availability';
-import { formatLongDate } from '../lib/format';
 
 const coco = await getEntry('coco', 'coco');
 const site = await getEntry('site', 'config');
-const { dueDate, litterEstimate, flags, cardCoverShoot } = site!.data;
+const { dueDate, litterEstimate, location, badges, flags, cardCoverShoot } = site!.data;
 
 const litterEntry = await getEntry('litter', 'litter');
-// Gate on `published`: the home page shows the birth announcement once the
-// litter is live, and falls back to the pre-birth countdown otherwise. `/`
-// can never redirect to itself, so both states must render here.
+// Gate on `published`: the home page introduces the puppies once the litter is
+// live, and falls back to the pre-birth countdown otherwise. `/` can never
+// redirect to itself, so both states must render here.
 const litter = litterEntry?.data.published ? litterEntry.data : null;
-const { Content } = litter && litterEntry ? await render(litterEntry) : { Content: null };
-const bornStr = litter ? formatLongDate(litter.bornDate) : '';
 const pageDescription = litter
-  ? `Coco's ${litter.count} puppies have arrived! Meet the whole litter, born ${bornStr}.`
+  ? `Meet Coco's ${litter.count} Bernese Mountain Dog puppies — family raised in ${location}, vet checked, and ready for their families.`
   : undefined;
 const pageOgImage = litter ? '/og-litter.jpg' : undefined;
 
 // Validate and index against every collar in the content, published or not —
 // the photo tree does not change when the announcement is toggled off.
 const photos = photosBySubject((litterEntry?.data.collars ?? []).map((c) => c.name));
-const availability = litter ? availabilityLine(litter.collars) : null;
 ---
 <BaseLayout title="Coco's Puppy Tales" description={pageDescription} ogImage={pageOgImage}>
   {litter ? (
     <>
-      <section class="section hero-litter">
-        <div class="container hero-grid pswp-gallery">
-          <div class="hero-header">
-            <h1>{litter.headline}</h1>
-            <p class="born">Born <strong>{bornStr}</strong></p>
+      <section class="section intro">
+        <div class="container">
+          <p class="eyebrow">Bernese Mountain Dog</p>
+          <h1>{litter.headline}</h1>
+          <div class="meta">
             <LitterAge bornDate={litter.bornDate} />
+            <span class="where">{location}</span>
           </div>
-          <ZoomableImage src={litter.heroImage}>
-            <Image src={litter.heroImage} alt="Coco nursing her nine newborn puppies" class="hero-img" widths={[400, 800]} sizes="(max-width: 700px) 100vw, 480px" format="webp" quality={80} />
-          </ZoomableImage>
-          <div class="hero-story">
-            <h2>They arrived a few days early!</h2>
-            {Content && <Content />}
-          </div>
+          <p class="tagline">{litter.tagline}</p>
+          <TrustBadges badges={badges} />
+          <a class="btn intro-cta" href="/waitlist">Take one home →</a>
         </div>
       </section>
 
-      <section class="section gohome-section">
+      <section class="section cast-section">
         <div class="container">
-          <h2>Ready to go home</h2>
-          <p>The puppies leave for their new families on <strong>{formatLongDate(litter.goHomeDate)}</strong>.</p>
-          <CountdownTimer targetDate={litter.goHomeDate} pastLabel="The puppies are home! 🐾" />
-        </div>
-      </section>
-
-      <section class="section">
-        <div class="container">
-          <LitterStats count={litter.count} boys={litter.boys} girls={litter.girls} />
-        </div>
-      </section>
-
-      <section class="section">
-        <div class="container">
-          <p class="eyebrow">Meet the cast</p>
-          <h2>Nine collars, nine personalities</h2>
-          {availability && <p class="availability">{availability}</p>}
+          <h2>Every collar, a different personality</h2>
           <div class="cast">
             {litter.collars.map((c) => (
               <PuppyCard
@@ -91,9 +65,9 @@ const availability = litter ? availabilityLine(litter.collars) : null;
       <section class="section">
         <div class="container">
           <div class="cta">
-            <h2>Hoping to welcome one of these pups?</h2>
-            <p>Families on the waitlist get first pick as the puppies grow.</p>
-            <a class="btn" href="/waitlist">Join the waitlist →</a>
+            <h2>Is one of them yours?</h2>
+            <p>Tell us about your home and we'll help match you with the pup who fits it.</p>
+            <a class="btn" href="/waitlist">Take one home →</a>
           </div>
         </div>
       </section>
@@ -116,7 +90,7 @@ const availability = litter ? availabilityLine(litter.collars) : null;
     <section class="section subscribe-section">
       <div class="container">
         <h2>Follow along</h2>
-        <p>Want updates without joining the waitlist? Get an email when there's big news.</p>
+        <p>Not ready for a puppy today? Get an email when there's big news.</p>
         <SubscribeForm />
       </div>
     </section>
@@ -124,47 +98,23 @@ const availability = litter ? availabilityLine(litter.collars) : null;
 </BaseLayout>
 
 <style>
-  .hero-litter { background: var(--c-cream); }
-  .hero-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto 1fr;
-    grid-template-areas:
-      "header image"
-      "story  image";
-    gap: 1.25rem 2rem;
-    align-items: start;
-  }
-  .hero-header { grid-area: header; }
-  .hero-img {
-    grid-area: image;
-    border-radius: var(--radius);
-    box-shadow: var(--shadow-lg);
-    width: 100%;
-    height: auto;
-    object-fit: cover;
-  }
-  .hero-story { grid-area: story; }
-  .hero-header h1 { font-size: clamp(2rem, 5vw, 3rem); margin: 0.6rem 0 0.4rem; }
-  .born { font-size: 1.15rem; margin: 0; }
-  .hero-story h2 { font-size: clamp(1.3rem, 3vw, 1.7rem); margin: 0 0 0.5rem; }
-  .hero-story :global(p) { font-size: 1.02rem; }
+  .intro h1 { font-size: clamp(2rem, 5vw, 3rem); margin: 0.6rem 0 0; max-width: 22ch; }
+  /* Age chip and location share a baseline row; they wrap together on narrow screens. */
+  .meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem 0.9rem; margin: 1rem 0 0; }
+  .where { color: var(--c-charcoal); font-size: 0.95rem; font-weight: 800; }
   .eyebrow { color: var(--eyebrow); font-size: 0.8rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 0.35rem; }
-  .availability { color: var(--c-brown); font-weight: 700; margin: 0 0 1rem; }
-  .cast { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; }
+  /* `--eyebrow` rather than `--c-brown`: this line is body-sized, and the plain
+     brown clears only 4.33:1 on cream. */
+  .tagline { color: var(--eyebrow); font-size: 1.1rem; font-weight: 800; margin: 0.9rem 0 0; }
+  .intro-cta { margin: 1.5rem 0 0; }
+  .cast-section { background: #fff; }
+  /* Fixed three columns rather than auto-fit: nine puppies land as a clean 3×3,
+     the same arrangement as the printed flyer, instead of a 4-4-1 with an
+     orphan in the last row. */
+  .cast { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+  @media (max-width: 860px) { .cast { grid-template-columns: repeat(2, 1fr); } }
   .cta { background: var(--c-sage-deep); color: #fff; border-radius: var(--radius); padding: 2rem; text-align: center; }
   .cta h2 { color: #fff; }
   .cta p { margin: 0.25rem 0 1.25rem; }
   .subscribe-section { background: #fff; }
-  .gohome-section { background: #fff; }
-  @media (max-width: 700px) {
-    .hero-grid {
-      grid-template-columns: 1fr;
-      grid-template-rows: auto;
-      grid-template-areas:
-        "header"
-        "image"
-        "story";
-    }
-  }
 </style>

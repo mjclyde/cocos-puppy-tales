@@ -1,25 +1,31 @@
 ---
-import { getAgeInDays } from '../lib/age';
+import { formatAge, getAgeInDays } from '../lib/age';
 interface Props { bornDate: Date; }
 const { bornDate } = Astro.props;
 const bornIso = bornDate.toISOString();
-const initial = getAgeInDays(bornDate, new Date()); // build-time paint; client corrects on load
+// Weeks are the unit families think in, and `formatAge` drops to days before the
+// first week. Painted at build time, then corrected on load so a page cached for
+// days never shows a stale age.
+const initial = formatAge(getAgeInDays(bornDate, new Date()));
 ---
 <p class="litter-age" id="litter-age" data-born={bornIso} aria-live="polite">
-  <span class="num" data-age-days>{initial.days}</span>
-  <span class="lbl">days old</span>
+  <span class="num" data-age-value>{initial.value}</span>
+  <span class="lbl" data-age-unit>{initial.unit}</span>
 </p>
 <script>
-  import { getAgeInDays } from '../lib/age';
+  import { formatAge, getAgeInDays } from '../lib/age';
   const el = document.getElementById('litter-age');
   if (el) {
     const born = new Date(el.dataset.born!);
-    const span = el.querySelector('[data-age-days]');
-    if (span) span.textContent = String(getAgeInDays(born, new Date()).days);
+    const { value, unit } = formatAge(getAgeInDays(born, new Date()));
+    const valueEl = el.querySelector('[data-age-value]');
+    const unitEl = el.querySelector('[data-age-unit]');
+    if (valueEl) valueEl.textContent = String(value);
+    if (unitEl) unitEl.textContent = unit;
   }
 </script>
 <style>
-  .litter-age { display: inline-flex; align-items: baseline; gap: 0.4rem; margin: 0.75rem 0 0; background: var(--c-sage); color: var(--c-cream); border-radius: var(--radius-pill); padding: 0.4rem 1rem; }
+  .litter-age { display: inline-flex; align-items: baseline; gap: 0.4rem; margin: 0; background: var(--c-sage); color: var(--c-cream); border-radius: var(--radius-pill); padding: 0.4rem 1rem; }
   .litter-age .num { font-size: 1.5rem; font-weight: 900; line-height: 1; }
   .litter-age .lbl { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; }
 </style>

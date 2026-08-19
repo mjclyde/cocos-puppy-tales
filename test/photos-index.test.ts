@@ -4,11 +4,11 @@ import { photosBySubject } from '../src/lib/photos';
 const COLLAR_NAMES = ['Blue', 'Black', 'Brown', 'Yellow', 'Orange', 'Pink', 'Purple', 'Red', 'Green'];
 
 describe('photosBySubject', () => {
-  it('resolves the real photo tree — 12 subjects, 137 photos total', () => {
+  it('resolves the real photo tree — 12 subjects, 146 photos total', () => {
     // The only check that the glob pattern actually resolves against the real
     // tree: a wrong `../` count yields zero matches, and the build plus both
     // negative build tests would all pass silently while the site renders
-    // empty. 137 is the current tree size (Task 2) — update this count when
+    // empty. 146 is the current tree size — update this count when
     // photos are added or removed; that upkeep is the deliberate tradeoff for
     // catching a broken glob.
     const bySubject = photosBySubject(COLLAR_NAMES);
@@ -16,7 +16,7 @@ describe('photosBySubject', () => {
     expect(Object.keys(bySubject)).toHaveLength(12);
 
     const total = Object.values(bySubject).reduce((sum, photos) => sum + photos.length, 0);
-    expect(total).toBe(137);
+    expect(total).toBe(146);
   });
 
   it('throws naming the collar(s) with no photo folder', () => {

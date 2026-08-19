@@ -1,21 +1,34 @@
 import { test, expect } from '@playwright/test';
 
-test('home page shows the litter, birth story, cast, and nav works', async ({ page }) => {
+test('home page leads with the nine puppies, their promises, and nav works', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: "Meet Coco's puppies" })).toBeVisible();
-  // Birth announcement replaced the pre-birth hero.
-  await expect(page.locator('#litter-age .num')).toBeVisible();
-  // The pre-birth countdown is gone, but a go-home countdown now runs.
-  await expect(page.locator('#countdown')).toHaveCount(1);
-  await expect(page.getByRole('heading', { name: 'Ready to go home' })).toBeVisible();
-  // Stats band.
-  await expect(page.getByText('9', { exact: true }).first()).toBeVisible();
-  // Birth story now lives in the hero.
-  await expect(page.getByRole('heading', { name: /They arrived a few days early/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: "Meet Coco's nine puppies" })).toBeVisible();
+  // The age chip reads in weeks at this stage, not days.
+  await expect(page.locator('#litter-age')).toContainText(/weeks old/);
+  await expect(page.getByText('Cache Valley, Utah')).toBeVisible();
+  // The printed flyer's four promises, so a visitor who scanned the QR code
+  // lands on the same claims they just read.
+  for (const promise of ['Family raised', 'Vet checked', 'AKC registered', 'Vaccinated']) {
+    await expect(page.getByText(promise, { exact: true })).toBeVisible();
+  }
+  // The birth is no longer the home page's story: no born date, no arrival
+  // write-up, and no go-home countdown now that the puppies are ready.
+  await expect(page.getByText(/^Born /)).toHaveCount(0);
+  await expect(page.getByRole('heading', { name: /They arrived a few days early/i })).toHaveCount(0);
+  await expect(page.locator('#countdown')).toHaveCount(0);
+  await expect(page.getByRole('heading', { name: 'Ready to go home' })).toHaveCount(0);
+  // The tagline replaced both the stat band and the "how many are left" count.
+  await expect(page.getByText(/going fast/i)).toBeVisible();
+  await expect(page.getByText(/still looking for their families/i)).toHaveCount(0);
   // All nine collar cards render, each naming its collar.
   await expect(page.getByText('Blue collar')).toBeVisible();
   await expect(page.getByText('Green collar')).toBeVisible();
-  await expect(page.getByRole('link', { name: /Join the waitlist/i })).toBeVisible();
+  // One CTA phrase site-wide, so the nav link shares it — scope to <main> to
+  // count just the page's two: the opening block and the closing band.
+  const ctas = page.locator('main').getByRole('link', { name: /^Take one home/i });
+  await expect(ctas).toHaveCount(2);
+  await expect(ctas.first()).toBeVisible();
+  await expect(page.getByRole('navigation').getByRole('link', { name: /^Take one home/i })).toBeVisible();
   // Nav still works.
   await page.getByRole('link', { name: 'The Journey' }).first().click();
   await expect(page).toHaveURL(/\/journey/);
@@ -25,19 +38,26 @@ test('home page shows the litter, birth story, cast, and nav works', async ({ pa
 test('clicking a photo opens the lightbox, navigates, and closes', async ({ page }) => {
   await page.goto('/');
   // Open the lightbox from the first puppy card's carousel (Blue collar, first
-  // in litter.md — now its own PhotoSwipe group of 9, since each carousel is a group).
-  await page.locator('.cast .slide-img').first().click();
+  // in litter.md). Each carousel is its own PhotoSwipe group, so the lightbox
+  // holds only that puppy's photos.
+  const card = page.locator('article.pup').first();
+  // The card's own counter reads "1 / <that puppy's photos>". Reading the total
+  // from it rather than hardcoding one keeps this a grouping assertion — the
+  // lightbox must show one puppy's set, not the whole page's — that survives a
+  // new shoot being added.
+  const total = (await card.getByText(/^\d+ \/ \d+$/).innerText()).split('/')[1].trim();
+  await card.locator('.slide-img').first().click();
   const pswp = page.locator('.pswp');
   await expect(pswp).toBeVisible();
   await expect(page.locator('.pswp img.pswp__img').first()).toBeVisible();
   // Counter proves grouping; asserting it also waits out the open animation.
   const counter = page.locator('.pswp__counter');
-  await expect(counter).toHaveText(/1\s*\/\s*9/);
+  await expect(counter).toHaveText(new RegExp(`1\\s*/\\s*${total}`));
   // Step to the next photo within the group. Scoped to the open lightbox:
   // the carousels behind it now also have "Next photo of <name>" buttons,
   // which collide with an unscoped `{ name: 'Next' }` substring match.
   await pswp.getByRole('button', { name: 'Next' }).click();
-  await expect(counter).toHaveText(/2\s*\/\s*9/);
+  await expect(counter).toHaveText(new RegExp(`2\\s*/\\s*${total}`));
   // Let the slide transition settle — PhotoSwipe drops a close issued mid-animation.
   await page.waitForTimeout(500);
   // Close with Escape — the lightbox is no longer open.
@@ -50,7 +70,7 @@ test('journey birth capstone links back to the home litter', async ({ page }) =>
   await expect(page.getByRole('heading', { name: /They're here!/ })).toBeVisible();
   await page.getByRole('link', { name: /Meet the whole litter/i }).click();
   await expect(page).toHaveURL(/\/$/);
-  await expect(page.getByRole('heading', { name: "Meet Coco's puppies" })).toBeVisible();
+  await expect(page.getByRole('heading', { name: "Meet Coco's nine puppies" })).toBeVisible();
 });
 
 test('waitlist form shows a validation error on empty submit', async ({ page }) => {
@@ -59,7 +79,7 @@ test('waitlist form shows a validation error on empty submit', async ({ page }) 
   await page.evaluate(() => {
     document.querySelectorAll('#waitlist-form [required]').forEach((el) => el.removeAttribute('required'));
   });
-  await page.getByRole('button', { name: 'Join the waitlist' }).click();
+  await page.getByRole('button', { name: /Send my info/ }).click();
   await expect(page.locator('#wl-msg')).not.toHaveText('', { timeout: 5000 });
 });
 
@@ -89,10 +109,14 @@ test('a cast card carousels through that puppy\'s photos', async ({ page }) => {
 test('the carousel wraps backwards from the first photo to the last', async ({ page }) => {
   await page.goto('/');
   const card = page.locator('article.pup', { hasText: 'Black collar' });
+  const counter = card.getByText(/^\d+ \/ \d+$/);
+  // Read the set size off the counter: the wrap is what's under test, and
+  // pinning a photo count here would red this spec every time a shoot lands.
+  const total = (await counter.innerText()).split('/')[1].trim();
 
   await card.hover();
   await card.getByRole('button', { name: 'Previous photo of Black' }).click();
-  await expect(card.getByText('6 / 6')).toBeVisible();
+  await expect(counter).toHaveText(`${total} / ${total}`);
 });
 
 test('the home page no longer shows the first-days grid', async ({ page }) => {
@@ -100,19 +124,18 @@ test('the home page no longer shows the first-days grid', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'First days' })).toHaveCount(0);
 });
 
-test('home page shows availability — two reserved, seven open', async ({ page }) => {
+test('no cast card claims Reserved while every collar is open', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByText('Seven are still looking for their families.')).toBeVisible();
-  // Only Orange and Yellow are reserved.
-  await expect(page.getByText('Reserved', { exact: true })).toHaveCount(2);
-  await expect(page.locator('article.pup.is-reserved')).toHaveCount(2);
-  await expect(page.locator('article.pup', { hasText: 'Yellow collar' })).toHaveClass(/is-reserved/);
-  await expect(page.locator('article.pup', { hasText: 'Blue collar' })).not.toHaveClass(/is-reserved/);
+  // No collar in litter.md carries `status: reserved` for this launch, so no
+  // card should wear the badge or the dimmed photo. The page no longer prints a
+  // running count of who is left — only the tagline speaks to demand.
+  await expect(page.getByText('Reserved', { exact: true })).toHaveCount(0);
+  await expect(page.locator('article.pup.is-reserved')).toHaveCount(0);
 });
 
 test('the details block answers price and go-home date before the form', async ({ page }) => {
   await page.goto('/waitlist');
-  await expect(page.getByRole('heading', { name: 'Bring one home' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Take one home' })).toBeVisible();
   await expect(page.getByText('August 20, 2026')).toBeVisible();
   await expect(page.getByText('$3,000')).toBeVisible();
   await expect(page.getByText('$250').first()).toBeVisible();

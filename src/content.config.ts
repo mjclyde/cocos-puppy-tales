@@ -1,5 +1,6 @@
 import { defineCollection, z } from 'astro:content';
 import { glob, file } from 'astro/loaders';
+import { BADGE_ICONS } from './lib/badges';
 
 const coco = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/coco' }),
@@ -57,6 +58,8 @@ const litter = defineCollection({
     raisingHighlights: z.array(z.string()).min(1),
     matchingNote: z.string(),
     headline: z.string(),
+    /** The line under the headline — urgency/status copy, editable without code. */
+    tagline: z.string(),
     heroImage: image(),
     collars: z.array(z.object({
       name: z.string(),
@@ -75,6 +78,13 @@ const site = defineCollection({
     dueDate: z.coerce.date(),
     litterEstimate: z.string(),
     contactEmail: z.string().email(),
+    /** Where the puppies are raised, e.g. "Cache Valley, Utah". */
+    location: z.string(),
+    /** The home page's trust row — same promises as the printed flyer. */
+    badges: z.array(z.object({
+      label: z.string(),
+      icon: z.enum(BADGE_ICONS),
+    })).default([]),
     socialLinks: z.array(z.object({ label: z.string(), url: z.string().url() })).default([]),
     // Shoot folder whose photos lead each cast card. Omit to fall back to newest-first.
     cardCoverShoot: z.string().optional(),

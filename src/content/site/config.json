@@ -4,8 +4,31 @@
     "dueDate": "2026-06-27T06:00:00.000Z",
     "litterEstimate": "at least 5 puppies",
     "contactEmail": "cocos-puppy-tales@mjclyde.com",
+    "location": "Cache Valley, Utah",
+    "badges": [
+      {
+        "label": "Family raised",
+        "icon": "home"
+      },
+      {
+        "label": "Vet checked",
+        "icon": "check"
+      },
+      {
+        "label": "AKC registered",
+        "icon": "ribbon"
+      },
+      {
+        "label": "Vaccinated",
+        "icon": "shield"
+      }
+    ],
     "socialLinks": [],
-    "cardCoverShoot": "2026-07-23",
-    "flags": { "showGallery": true, "showSubscribe": true, "showPricing": true }
+    "cardCoverShoot": "2026-08-13",
+    "flags": {
+      "showGallery": true,
+      "showSubscribe": true,
+      "showPricing": true
+    }
   }
 ]

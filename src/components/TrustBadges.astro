@@ -1,0 +1,73 @@
+---
+// The flyer's four promises as a row of pills. Labels come from site config;
+// each icon name maps to one of the line drawings below, and `content.config.ts`
+// rejects a name with no drawing so a typo fails the build instead of rendering
+// a blank pill.
+import type { Badge, BadgeIcon } from '../lib/badges';
+
+interface Props {
+  badges: Badge[];
+}
+
+const { badges } = Astro.props;
+
+// Stroke-only drawings on a 24×24 grid, in `currentColor` to match the flyer's
+// outline icons. Circles are listed separately because `<circle>` renders a
+// rounder ring than an equivalent arc path at this size.
+const ICONS: Record<BadgeIcon, { paths: string[]; circles?: { cx: number; cy: number; r: number }[] }> = {
+  home: { paths: ['M4 10.4 12 4l8 6.4V20a1 1 0 0 1-1 1h-4.3v-6.1H9.3V21H5a1 1 0 0 1-1-1z'] },
+  check: { paths: ['m8.2 12.3 2.7 2.7 5-5.6'], circles: [{ cx: 12, cy: 12, r: 8.6 }] },
+  ribbon: { paths: ['M8.7 13.9 7.2 21.4 12 18.7l4.8 2.7-1.5-7.5'], circles: [{ cx: 12, cy: 9, r: 5.6 }] },
+  shield: { paths: ['M12 3.3 5.2 5.7v6.1c0 4.4 2.8 7.5 6.8 8.9 4-1.4 6.8-4.5 6.8-8.9V5.7z'] },
+};
+---
+{badges.length > 0 && (
+  <ul class="badges">
+    {badges.map(({ label, icon }) => (
+      <li class="badge">
+        <svg class="badge-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          {ICONS[icon].circles?.map((c) => <circle cx={c.cx} cy={c.cy} r={c.r} />)}
+          {ICONS[icon].paths.map((d) => <path d={d} />)}
+        </svg>
+        <span>{label}</span>
+      </li>
+    ))}
+  </ul>
+)}
+<style>
+  .badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 0.85rem;
+    list-style: none;
+    margin: 1.25rem 0 0;
+    padding: 0;
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    background: #fff;
+    border-radius: var(--radius-pill);
+    box-shadow: var(--shadow);
+    color: var(--heading);
+    font-size: 0.88rem;
+    font-weight: 800;
+    padding: 0.45rem 0.9rem 0.45rem 0.7rem;
+  }
+  /* The icon carries the accent colour; the label stays navy for contrast. */
+  .badge-icon {
+    flex: 0 0 auto;
+    width: 1.2rem;
+    height: 1.2rem;
+    color: var(--accent-2);
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  @media (max-width: 420px) {
+    .badge { font-size: 0.82rem; padding: 0.4rem 0.75rem 0.4rem 0.6rem; }
+  }
+</style>

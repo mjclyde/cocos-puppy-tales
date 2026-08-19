@@ -8,14 +8,14 @@ const litter = await getEntry('litter', 'litter');
 const site = await getEntry('site', 'config');
 const showPricing = site!.data.flags.showPricing;
 const description = showPricing
-  ? "Pricing, go-home date, and the waitlist for one of Coco's puppies."
-  : "Go-home date and the waitlist for one of Coco's puppies.";
+  ? "Pricing, what comes with a puppy, and how to bring one of Coco's puppies home."
+  : "What comes with a puppy, and how to bring one of Coco's puppies home.";
 ---
-<BaseLayout title="Bring one home — Coco's Puppy Tales" description={description}>
+<BaseLayout title="Take one home — Coco's Puppy Tales" description={description}>
   <section class="section">
     <div class="container">
-      <h1>Bring one home</h1>
-      <p>Hoping to welcome one of Coco's puppies? Here's everything you'd be signing up for — then tell us about your home. We read every submission and reach out personally.</p>
+      <h1>Take one home</h1>
+      <p>Coco's puppies are ready for their families now. Here's everything that comes with one — then tell us about your home. We read every submission and reach out personally.</p>
 
       {litter && (
         <PuppyDetails
