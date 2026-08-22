@@ -13,9 +13,12 @@ interface Props {
 }
 
 const { name, hex, sex, status, note, photos } = Astro.props;
-const isReserved = status === 'reserved';
+// The content status stays `reserved` — the schema's single "not available"
+// state, which covers both a paid deposit and a puppy already home. The badge
+// says "Adopted" because that is the warmer word for a visitor reading it.
+const isAdopted = status === 'reserved';
 ---
-<article class:list={['pup', { 'is-reserved': isReserved }]} style={`--collar: ${hex}`}>
+<article class:list={['pup', { 'is-adopted': isAdopted }]} style={`--collar: ${hex}`}>
   <div class="pup-photo">
     <PuppyCarousel name={name} photos={photos} />
   </div>
@@ -25,7 +28,7 @@ const isReserved = status === 'reserved';
         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
       </svg>
       <span class="pup-name">{name} collar</span>
-      {isReserved && <span class="reserved">Reserved</span>}
+      {isAdopted && <span class="adopted">Adopted</span>}
       <span class={`sex sex-${sex}`}>{sex}</span>
     </div>
     {note && <p class="pup-note">{note}</p>}
@@ -43,9 +46,9 @@ const isReserved = status === 'reserved';
   .pup-note { margin: 0.5rem 0 0; color: var(--text); font-size: 0.9rem; line-height: 1.4; }
   /* Dim only the photo, not the whole card — the name/note/sex-chip text needs
      full contrast against the cream page background to clear WCAG AA; the
-     "Reserved" state is conveyed by the badge text below, not by opacity. */
-  .pup.is-reserved .pup-photo { opacity: 0.75; }
-  .reserved {
+     "Adopted" state is conveyed by the badge text below, not by opacity. */
+  .pup.is-adopted .pup-photo { opacity: 0.75; }
+  .adopted {
     background: var(--c-cream);
     border: 1px solid rgba(43, 41, 38, 0.18);
     border-radius: var(--radius-pill);

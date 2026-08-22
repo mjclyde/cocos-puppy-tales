@@ -1,8 +1,8 @@
 /**
  * Derives what the site says about which puppies are still open.
  *
- * Both the per-card badge and the count line above the cast grid read from the
- * same `collars` array, so one content edit moves them together and they cannot
+ * Both the per-card badge and the notice above the cast grid read from the same
+ * `collars` array, so one content edit moves them together and they cannot
  * drift out of sync.
  */
 
@@ -13,8 +13,15 @@ export interface CollarLike {
   status: CollarStatus;
 }
 
+/** A collar the copy can name, not just count. */
+export interface NamedCollarLike extends CollarLike {
+  name: string;
+}
+
+const isAvailable = (collar: CollarLike): boolean => collar.status === 'available';
+
 export function countAvailable(collars: CollarLike[]): number {
-  return collars.filter((collar) => collar.status === 'available').length;
+  return collars.filter(isAvailable).length;
 }
 
 // Spelled-out counts read warmer than digits in a sentence, and a litter never
@@ -29,15 +36,17 @@ const spell = (n: number): string => {
 };
 
 /**
- * `"Seven are still looking for their families."`
+ * The availability notice, in three shapes:
  *
- * Returns `null` when nothing is available so the caller omits the line
- * entirely rather than announcing "Zero are still looking".
+ * - `"Just one puppy left — the Yellow collar."` at exactly one, because the
+ *   last puppy deserves to be pointed at by name rather than counted.
+ * - `"Seven are still looking for their families."` above that.
+ * - `null` when nothing is available, so the caller omits the line entirely
+ *   rather than announcing "Zero are still looking".
  */
-export function availabilityLine(collars: CollarLike[]): string | null {
-  const open = countAvailable(collars);
-  if (open === 0) return null;
-  return open === 1
-    ? `${spell(open)} is still looking for a family.`
-    : `${spell(open)} are still looking for their families.`;
+export function availabilityLine(collars: NamedCollarLike[]): string | null {
+  const open = collars.filter(isAvailable);
+  if (open.length === 0) return null;
+  if (open.length === 1) return `Just one puppy left — the ${open[0].name} collar.`;
+  return `${spell(open.length)} are still looking for their families.`;
 }

@@ -5,9 +5,11 @@ import CountdownTimer from '../components/CountdownTimer.astro';
 import LitterAge from '../components/LitterAge.astro';
 import PuppyCard from '../components/PuppyCard.astro';
 import TrustBadges from '../components/TrustBadges.astro';
+import PawIcon from '../components/PawIcon.astro';
 import SubscribeForm from '../components/SubscribeForm.astro';
 import { getEntry } from 'astro:content';
 import { photosBySubject, withCoverFirst } from '../lib/photos';
+import { availabilityLine } from '../lib/availability';
 
 const coco = await getEntry('coco', 'coco');
 const site = await getEntry('site', 'config');
@@ -26,6 +28,11 @@ const pageOgImage = litter ? '/og-litter.jpg' : undefined;
 // Validate and index against every collar in the content, published or not —
 // the photo tree does not change when the announcement is toggled off.
 const photos = photosBySubject((litterEntry?.data.collars ?? []).map((c) => c.name));
+
+// Derived from the collar statuses, not typed by hand: it names the last puppy
+// while one is open, counts them while several are, and disappears on its own
+// once the litter is fully spoken for.
+const availability = litter ? availabilityLine(litter.collars) : null;
 ---
 <BaseLayout title="Coco's Puppy Tales" description={pageDescription} ogImage={pageOgImage}>
   {litter ? (
@@ -38,6 +45,9 @@ const photos = photosBySubject((litterEntry?.data.collars ?? []).map((c) => c.na
             <LitterAge bornDate={litter.bornDate} />
             <span class="where">{location}</span>
           </div>
+          {availability && (
+            <p class="availability"><PawIcon /> {availability}</p>
+          )}
           <p class="tagline">{litter.tagline}</p>
           <TrustBadges badges={badges} />
           <a class="btn intro-cta" href="/waitlist">Take one home →</a>
@@ -106,6 +116,25 @@ const photos = photosBySubject((litterEntry?.data.collars ?? []).map((c) => c.na
   /* `--eyebrow` rather than `--c-brown`: this line is body-sized, and the plain
      brown clears only 4.33:1 on cream. */
   .tagline { color: var(--eyebrow); font-size: 1.1rem; font-weight: 800; margin: 0.9rem 0 0; }
+  /* Outlined, not filled: `.btn` is already a solid `--pop` pill, so a honey
+     fill here would read as a second button competing with "Take one home".
+     The border carries the accent, white keeps it an announcement, and charcoal
+     on white is the page's highest-contrast pairing. */
+  .availability {
+    align-items: center;
+    background: #fff;
+    border: 2px solid var(--pop);
+    border-radius: var(--radius-pill);
+    color: var(--c-charcoal);
+    display: inline-flex;
+    font-size: 1rem;
+    font-weight: 900;
+    gap: 0.5rem;
+    margin: 1.2rem 0 0;
+    padding: 0.55rem 1.1rem;
+  }
+  /* The paw picks up the accent the fill gave up. */
+  .availability :global(svg) { color: var(--eyebrow); }
   .intro-cta { margin: 1.5rem 0 0; }
   .cast-section { background: #fff; }
   /* Fixed three columns rather than auto-fit: nine puppies land as a clean 3×3,

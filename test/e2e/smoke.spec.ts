@@ -17,8 +17,10 @@ test('home page leads with the nine puppies, their promises, and nav works', asy
   await expect(page.getByRole('heading', { name: /They arrived a few days early/i })).toHaveCount(0);
   await expect(page.locator('#countdown')).toHaveCount(0);
   await expect(page.getByRole('heading', { name: 'Ready to go home' })).toHaveCount(0);
-  // The tagline replaced both the stat band and the "how many are left" count.
-  await expect(page.getByText(/going fast/i)).toBeVisible();
+  // The intro carries the derived availability notice plus the editable tagline.
+  await expect(page.getByText('Just one puppy left — the Yellow collar.')).toBeVisible();
+  await expect(page.getByText('Eight of the nine have found their families.')).toBeVisible();
+  // The plural count wording belongs to a litter with more than one collar open.
   await expect(page.getByText(/still looking for their families/i)).toHaveCount(0);
   // All nine collar cards render, each naming its collar.
   await expect(page.getByText('Blue collar')).toBeVisible();
@@ -124,13 +126,17 @@ test('the home page no longer shows the first-days grid', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'First days' })).toHaveCount(0);
 });
 
-test('no cast card claims Reserved while every collar is open', async ({ page }) => {
+test('the cast marks the eight taken puppies and leaves the last one open', async ({ page }) => {
   await page.goto('/');
-  // No collar in litter.md carries `status: reserved` for this launch, so no
-  // card should wear the badge or the dimmed photo. The page no longer prints a
-  // running count of who is left — only the tagline speaks to demand.
+  // Eight collars carry `status: reserved` in litter.md, so eight cards wear the
+  // Adopted badge and the dimmed photo — and exactly one does not.
+  await expect(page.getByText('Adopted', { exact: true })).toHaveCount(8);
+  await expect(page.locator('article.pup.is-adopted')).toHaveCount(8);
+  const open = page.locator('article.pup:not(.is-adopted)');
+  await expect(open).toHaveCount(1);
+  await expect(open).toContainText('Yellow collar');
+  // "Reserved" was the badge's old wording; nothing should still say it.
   await expect(page.getByText('Reserved', { exact: true })).toHaveCount(0);
-  await expect(page.locator('article.pup.is-reserved')).toHaveCount(0);
 });
 
 test('the details block answers price and go-home date before the form', async ({ page }) => {

@@ -1,9 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import { countAvailable, availabilityLine } from '../src/lib/availability';
-import type { CollarLike } from '../src/lib/availability';
+import type { CollarLike, CollarStatus, NamedCollarLike } from '../src/lib/availability';
 
-const collars = (...statuses: CollarLike['status'][]): CollarLike[] =>
-  statuses.map((status) => ({ status }));
+const collars = (...statuses: CollarLike['status'][]): NamedCollarLike[] =>
+  statuses.map((status, i) => ({ name: `Collar ${i + 1}`, status }));
+
+const named = (...entries: [string, CollarStatus][]): NamedCollarLike[] =>
+  entries.map(([name, status]) => ({ name, status }));
 
 describe('countAvailable', () => {
   it('counts only the available collars', () => {
@@ -27,7 +30,7 @@ describe('countAvailable', () => {
 });
 
 describe('availabilityLine', () => {
-  it('spells out the count for the current litter — seven of nine open', () => {
+  it('spells out the count for a part-open litter', () => {
     const litter = collars(
       'available', 'available', 'available', 'reserved', 'reserved',
       'available', 'available', 'available', 'available',
@@ -35,9 +38,19 @@ describe('availabilityLine', () => {
     expect(availabilityLine(litter)).toBe('Seven are still looking for their families.');
   });
 
-  it('uses singular wording for exactly one', () => {
-    expect(availabilityLine(collars('available', 'reserved'))).toBe(
-      'One is still looking for a family.',
+  it('names the collar for the last puppy — the current litter', () => {
+    const litter = named(
+      ['Blue', 'reserved'], ['Black', 'reserved'], ['Brown', 'reserved'],
+      ['Yellow', 'available'],
+      ['Orange', 'reserved'], ['Pink', 'reserved'], ['Purple', 'reserved'],
+      ['Red', 'reserved'], ['Green', 'reserved'],
+    );
+    expect(availabilityLine(litter)).toBe('Just one puppy left — the Yellow collar.');
+  });
+
+  it('names whichever collar is the open one, wherever it sits in the litter', () => {
+    expect(availabilityLine(named(['Pink', 'available'], ['Blue', 'reserved']))).toBe(
+      'Just one puppy left — the Pink collar.',
     );
   });
 
@@ -53,5 +66,12 @@ describe('availabilityLine', () => {
     expect(availabilityLine(collars(...Array(12).fill('available' as const)))).toBe(
       '12 are still looking for their families.',
     );
+  });
+
+  it('does not mutate the input', () => {
+    const input = named(['Yellow', 'available'], ['Blue', 'reserved']);
+    const copy = structuredClone(input);
+    availabilityLine(input);
+    expect(input).toEqual(copy);
   });
 });

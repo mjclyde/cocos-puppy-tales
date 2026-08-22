@@ -21,59 +21,72 @@ raisingHighlights:
   - ENS (early neurological stimulation) and ESI (early scent introduction)
   - Daily socialization and enrichment
   - Potty training started
-matchingNote: "We'd love to help match you with the puppy whose personality and energy level best fit your family and lifestyle."
+matchingNote: "Yellow collar is the last puppy still looking for a home. We'd love to hear about your family and make sure he's the right fit."
 headline: "Meet Coco's nine puppies"
-tagline: "Ready to go home now — and they're going fast."
+tagline: "Eight of the nine have found their families."
 heroImage: ../../assets/litter/hero.jpg
 collars:
   - {
       name: "Blue",
       hex: "#3b6fd6",
       sex: boy,
+      status: reserved,
       note: "First born — led the way.",
     }
   - {
       name: "Black",
       hex: "#2a2a2a",
       sex: boy,
+      status: reserved,
       note: "The dramatic one — growing fastest.",
     }
   - {
       name: "Brown",
       hex: "#8a5a2b",
       sex: boy,
+      status: reserved,
       note: 'Aka "Potato" — loves to sleep.',
     }
   - {
       name: "Yellow",
       hex: "#e0b031",
       sex: boy,
+      status: available,
       note: "Has the most unique markings.",
     }
   - {
       name: "Orange",
       hex: "#e8863b",
       sex: boy,
+      status: reserved,
       note: "First to open his eyes.",
     }
-  # - { name: "Orange", hex: "#e8863b", sex: boy,  status: reserved, note: "First to open his eyes." }
-  - { name: "Pink", hex: "#e58fb0", sex: girl, note: "Coco's little mini-me." }
+  - {
+      name: "Pink",
+      hex: "#e58fb0",
+      sex: girl,
+      status: reserved,
+      note: "Coco's little mini-me.",
+    }
   - {
       name: "Purple",
       hex: "#7b4fc9",
       sex: girl,
+      status: reserved,
       note: "Last to arrive, worth the wait.",
     }
   - {
       name: "Red",
       hex: "#d24a45",
       sex: girl,
+      status: reserved,
       note: 'Sweet and small — nicknamed "Ruby."',
     }
   - {
       name: "Green",
       hex: "#5a9e4f",
       sex: girl,
+      status: reserved,
       note: "Little, quiet & unbearably cute.",
     }
 published: true
